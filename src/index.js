@@ -1,8 +1,6 @@
 import './style.css';
 
 
-import ReactTest from './reactTest';
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -15,10 +13,10 @@ import ReactDOM from 'react-dom';
 
 
 
-import {App} from './firebase/firebase';
+import AuthForm from './firebase/firebase';
 
 ReactDOM.render(
-    <App />,
+    <AuthForm />,
     document.getElementById("ReactRoot"));
 
 
