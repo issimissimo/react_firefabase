@@ -21,6 +21,32 @@ function showUserData(data) {
   console.log(data);
 }
 
+function aaaa() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve("ciao zio!");
+    }, 2000);
+  });
+}
+
+/// this function is quite strange...
+/// it is called when a FB user has changed authenticatication parameters,
+/// and at very start!
+/// but we need it to proceed after logging
+/// to create the room...
+// firebase.auth().onAuthStateChanged(user => {
+
+// })
+
+// setTimeout(()=>{
+//     firebase.auth().onAuthStateChanged(function (user) {
+//         console.log('***************')
+//         console.log('your id is:')
+//         console.log(user.uid)
+//         console.log('***************')
+//     });
+// },500)
+
 //////////////////////
 /// LOGIN FORM
 //////////////////////
@@ -103,6 +129,12 @@ export default class AuthForm extends React.Component {
       LOGIN: "login",
     };
 
+    this.user = {
+      uid: "",
+      displayName: "",
+      isAdmin: false,
+    };
+
     this.state = {
       authState: this.AUTH_STATE.LOGIN,
       email: "",
@@ -116,7 +148,27 @@ export default class AuthForm extends React.Component {
     this.handleChangePassword = this.handleChangePassword.bind(this);
     this.handleChangeFirstName = this.handleChangeFirstName.bind(this);
     this.handleChangeLastName = this.handleChangeLastName.bind(this);
-    // this.handleSubmit = this.handleSubmit.bind(this);
+    this.login = this.login.bind(this);
+  }
+
+  componentDidMount() {
+    ///listen for auth status changes
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.user.uid = user.uid;
+        this.user.displayName = user.displayName;
+
+        /// check if user is admin
+        user.getIdTokenResult().then((idTokenResult) => {
+          if (idTokenResult.claims.admin) this.user.isAdmin = true;
+
+          ///
+          console.log(this.user.displayName);
+          console.log("your firebase uid: " + this.user.uid);
+          console.log(this.user.isAdmin);
+        });
+      }
+    });
   }
 
   changeAuthState() {
@@ -126,6 +178,16 @@ export default class AuthForm extends React.Component {
         : this.AUTH_STATE.LOGIN;
 
     this.setState({ authState: newAuthState });
+  }
+
+  login() {
+    const email = this.state.email;
+    const password = this.state.password;
+    firebase.auth().signInWithEmailAndPassword(email, password);
+  }
+
+  logout() {
+    firebase.auth().signOut();
   }
 
   handleChangeEmail(event) {
@@ -156,10 +218,6 @@ export default class AuthForm extends React.Component {
   //   register() {
   //     console.log("register....");
   //   }
-
-  onAuth() {
-    console.log("MA VIENI!!!");
-  }
 
   render() {
     /// change auth state
@@ -209,18 +267,11 @@ export default class AuthForm extends React.Component {
 
         <FirebaseAuthProvider {...config} firebase={firebase}>
           <div>
-            <button
-              onClick={() => {
-                firebase.auth().signInWithEmailAndPassword(email, password);
-              }}
-            >
-              SUBMIT
-            </button>
+            <button onClick={this.login}>SUBMIT</button>
 
             <FirebaseAuthConsumer>
               {({ isSignedIn, user, providerId }) => {
                 console.log("firebase auth consumer - completato");
-                this.onAuth();
                 return (
                   <pre style={{ height: 300, overflow: "auto" }}>
                     {JSON.stringify({ isSignedIn, user, providerId }, null, 2)}
@@ -253,6 +304,8 @@ export default class AuthForm extends React.Component {
         <button onClick={this.changeAuthState}>
           {changeAuthStateBttnText}
         </button>
+
+        <button onClick={this.logout}>Sign Out</button>
       </div>
     );
   }
