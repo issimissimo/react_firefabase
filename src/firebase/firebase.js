@@ -1,6 +1,7 @@
 import * as React from "react";
 import firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/functions";
 import {
   FirebaseAuthProvider,
   FirebaseAuthConsumer,
@@ -9,9 +10,6 @@ import {
 } from "@react-firebase/auth";
 import { config } from "./firebaseConfig";
 import { Gathering } from "./gathering";
-
-const email = "d.suppo@issimissimo.com";
-const passw = "123456";
 
 //////////////////////
 /// LOGIN FORM
@@ -168,12 +166,13 @@ class AuthForm extends React.Component {
     else this.register();
   }
 
+  //////
+  // login
+  //////
   login() {
-    const email = this.state.email;
-    const password = this.state.password;
     firebase
       .auth()
-      .signInWithEmailAndPassword(email, password)
+      .signInWithEmailAndPassword(this.state.email, this.state.password)
       .then((cred) => {
         this.setState({ errorMessage: null });
       })
@@ -183,8 +182,57 @@ class AuthForm extends React.Component {
       });
   }
 
+  //////
+  // register
+  //////
   register() {
     console.log("register....");
+    const firstName = this.state.firstName;
+    const lastName = this.state.lastName;
+    console.log(firstName);
+    console.log(lastName);
+    if (this.state.firstName == "" || this.state.lastName == "") {
+      this.setState({
+        errorMessage: "You didn't type First name and Last name",
+      });
+      return;
+    }
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(this.state.email, this.state.password)
+      .then((cred) => {
+        // this.setState({ errorMessage: null });
+        cred.user
+          .updateProfile({
+            displayName: this.state.firstName + " " + this.state.lastName,
+          })
+          .then(() => {
+            /// make the user an admin
+            const addAdminRole = firebase
+              .functions()
+              .httpsCallable("addAdminRole");
+            addAdminRole({ email: this.state.email })
+              .then((result) => {
+                // UI.handleMessage(
+                //   email +
+                //     " as been registered as Administrator! NOW Please login..."
+                // );
+                // UI.state = UI.STATES.LOGIN;
+                // FB.logout();
+                // resolve();
+                console.log(
+                  this.state.email + " has been registered as Administrator!"
+                );
+              })
+              .catch((err) => {
+                console.error(err.message);
+              });
+          });
+      })
+      .catch((err) => {
+        console.error(err.message);
+        this.setState({ errorMessage: err.message });
+      });
   }
 
   render() {
