@@ -109,6 +109,7 @@ class AuthForm extends React.Component {
     this.handleChangeLastName = this.handleChangeLastName.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.login = this.login.bind(this);
+    this.logout = this.logout.bind(this);
     this.register = this.register.bind(this);
   }
 
@@ -116,18 +117,25 @@ class AuthForm extends React.Component {
     ///listen for auth status changes
     firebase.auth().onAuthStateChanged((user) => {
       console.log("---- user changed ----");
-      let uid = null;
-      let displayName = "";
-      let isAdmin = false;
+      console.log("listerner: " + this.state.authState);
+
       if (user) {
-        uid = user.uid;
-        displayName = user.displayName;
+        console.log("DETECTED USER SIGNED IN!!!");
+        const uid = user.uid;
+        const displayName = user.displayName;
+        let isAdmin;
 
         /// check if user is admin
         user.getIdTokenResult().then((idTokenResult) => {
+          console.log(idTokenResult.claims);
+          console.log(idTokenResult.claims.admin);
           if (idTokenResult.claims.admin) isAdmin = true;
 
           this.props.onUserChange(uid, displayName, isAdmin);
+
+          if (this.state.authState === this.AUTH_STATE.LOGIN) {
+            this.props.onSignedIn();
+          }
         });
       } else {
         console.log("NO USER!");
@@ -183,10 +191,17 @@ class AuthForm extends React.Component {
   }
 
   //////
+  // logout
+  //////
+  logout() {
+    this.props.onSignedOut();
+  }
+
+  //////
   // register
   //////
   register() {
-    console.log("register....");
+    console.log("register: " + this.state.authState);
     const firstName = this.state.firstName;
     const lastName = this.state.lastName;
     console.log(firstName);
@@ -207,10 +222,12 @@ class AuthForm extends React.Component {
             displayName: this.state.firstName + " " + this.state.lastName,
           })
           .then(() => {
-            /// make the user an admin
+            /// make the user an admin...
             const addAdminRole = firebase
               .functions()
               .httpsCallable("addAdminRole");
+
+            ///call the function (NOOOOOOOOO!!! non fà un cazzo! deve essere admin!!!!)
             addAdminRole({ email: this.state.email })
               .then((result) => {
                 // UI.handleMessage(
@@ -223,6 +240,9 @@ class AuthForm extends React.Component {
                 console.log(
                   this.state.email + " has been registered as Administrator!"
                 );
+                // this.props.onSignedIn();
+                this.logout();
+                this.changeAuthState();
               })
               .catch((err) => {
                 console.error(err.message);
@@ -236,7 +256,7 @@ class AuthForm extends React.Component {
   }
 
   render() {
-    /// change auth state
+    console.log("render: " + this.state.authState);
     let changeAuthStateBttnText;
     let changeAuthStateText;
     if (this.state.authState === this.AUTH_STATE.LOGIN) {
@@ -286,7 +306,9 @@ class AuthForm extends React.Component {
 
             <FirebaseAuthConsumer>
               {({ isSignedIn, user, providerId }) => {
-                console.log("firebase auth consumer - completato");
+                {
+                  /* console.log("firebase auth consumer - completato"); */
+                }
                 return (
                   <pre style={{ height: 300, overflow: "auto" }}>
                     {JSON.stringify({ isSignedIn, user, providerId }, null, 2)}
@@ -297,7 +319,9 @@ class AuthForm extends React.Component {
             <div>
               <IfFirebaseAuthed>
                 {() => {
-                  console.log("firebase authed - completato");
+                  {
+                    /* console.log("firebase authed - completato"); */
+                  }
                   return <div>You are authenticated</div>;
                 }}
               </IfFirebaseAuthed>
@@ -394,14 +418,11 @@ class AuthForm extends React.Component {
 // render(<App />, document.getElementById("ReactRoot"));
 
 function TopBar(props) {
-  const logout = () => {
-    firebase.auth().signOut();
-  };
   return (
     <div className="top-bar">
       <div style={{ display: "flex" }}>
         <p>{props.displayName}</p>
-        <button onClick={logout}>Sign Out</button>
+        <button onClick={props.onSignedOut}>Sign Out</button>
       </div>
     </div>
   );
@@ -415,7 +436,12 @@ class Main extends React.Component {
     super(props);
   }
   render() {
-    return <TopBar displayName={this.props.user.displayName} />;
+    return (
+      <TopBar
+        displayName={this.props.user.displayName}
+        onSignedOut={this.props.onSignedOut}
+      />
+    );
   }
 }
 
@@ -425,22 +451,52 @@ class Main extends React.Component {
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      user: { uid: null, displayName: "", isAdmin: false },
-    };
+    // this.state = {
+    //   user: { uid: null, displayName: "", isAdmin: false },
+    // };
+    this.state = { isSignedIn: false };
+    this.user = { uid: null, displayName: "", isAdmin: false };
     this.handleUserChange = this.handleUserChange.bind(this);
+    this.handleSignedIn = this.handleSignedIn.bind(this);
+    this.handleSignedOut = this.handleSignedOut.bind(this);
   }
+
+  handleSignedIn() {
+    console.log("SIGNED IN!!!!!!!!");
+    this.setState({ isSignedIn: true });
+  }
+
+  handleSignedOut() {
+    console.log("SIGNED OUT!!!!!!!!");
+    firebase.auth().signOut();
+    this.setState({ isSignedIn: false });
+  }
+
   handleUserChange(_uid, _displayName, _isAdmin) {
-    this.setState({
-      user: { uid: _uid, displayName: _displayName, isAdmin: _isAdmin },
-    });
+    console.log(">>>> ----------------");
+    console.log("handleUserChange");
+    // this.setState({
+    //   user: { uid: _uid, displayName: _displayName, isAdmin: _isAdmin },
+    // });
+    this.user = { uid: _uid, displayName: _displayName, isAdmin: _isAdmin };
+    console.log(this.user);
+    console.log("----------------<<<<");
+    // if (!_uid) this.setState({ isSignedIn: false });
   }
 
   render() {
-    const content = this.state.user.uid ? (
-      <Main user={this.state.user} />
+    console.log(">>>> ----------------");
+    console.log("render");
+    console.log(this.user);
+    console.log("----------------<<<<");
+    const content = this.state.isSignedIn ? (
+      <Main user={this.user} onSignedOut={this.handleSignedOut} />
     ) : (
-      <AuthForm onUserChange={this.handleUserChange} />
+      <AuthForm
+        onUserChange={this.handleUserChange}
+        onSignedIn={this.handleSignedIn}
+        onSignedOut={this.handleSignedOut}
+      />
     );
     return <div>{content}</div>;
   }
