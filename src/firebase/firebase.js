@@ -120,7 +120,7 @@ function RegisterForm(props) {
 //////////////////////
 /// AUTHORIZATION FORM
 //////////////////////
-export default class AuthForm extends React.Component {
+class AuthForm extends React.Component {
   constructor(props) {
     super(props);
 
@@ -129,11 +129,11 @@ export default class AuthForm extends React.Component {
       LOGIN: "login",
     };
 
-    this.user = {
-      uid: "",
-      displayName: "",
-      isAdmin: false,
-    };
+    // this.user = {
+    //   uid: "",
+    //   displayName: "",
+    //   isAdmin: false,
+    // };
 
     this.state = {
       authState: this.AUTH_STATE.LOGIN,
@@ -154,19 +154,23 @@ export default class AuthForm extends React.Component {
   componentDidMount() {
     ///listen for auth status changes
     firebase.auth().onAuthStateChanged((user) => {
+      console.log("---- user changed ----");
+      let uid = null;
+      let displayName = "";
+      let isAdmin = false;
       if (user) {
-        this.user.uid = user.uid;
-        this.user.displayName = user.displayName;
+        uid = user.uid;
+        displayName = user.displayName;
 
         /// check if user is admin
         user.getIdTokenResult().then((idTokenResult) => {
-          if (idTokenResult.claims.admin) this.user.isAdmin = true;
+          if (idTokenResult.claims.admin) isAdmin = true;
 
-          ///
-          console.log(this.user.displayName);
-          console.log("your firebase uid: " + this.user.uid);
-          console.log(this.user.isAdmin);
+          this.props.onUserChange(uid, displayName, isAdmin);
         });
+      } else {
+        console.log("NO USER!");
+        this.props.onUserChange(null, "", false);
       }
     });
   }
@@ -258,9 +262,6 @@ export default class AuthForm extends React.Component {
       );
     }
 
-    const email = this.state.email;
-    const password = this.state.password;
-
     return (
       <div className="container">
         {form}
@@ -305,43 +306,84 @@ export default class AuthForm extends React.Component {
           {changeAuthStateBttnText}
         </button>
 
-        <button onClick={this.logout}>Sign Out</button>
+        {/* <button onClick={this.logout}>Sign Out</button> */}
       </div>
     );
   }
 }
 
-/////////////////////////////////////////
-///// EXAMPLE
-/////////////////////////////////////////
-const App = () => {
-  return (
-    <FirebaseAuthProvider {...config} firebase={firebase}>
-      <div>
-        <button
-          onClick={() => {
-            firebase.auth().signInWithEmailAndPassword(email, passw);
-          }}
-        >
-          Sign In with email and password
-        </button>
+// /////////////////////////////////////////
+// ///// EXAMPLE
+// /////////////////////////////////////////
+// const App = () => {
+//   return (
+//     <FirebaseAuthProvider {...config} firebase={firebase}>
+//       <div>
+//         <button
+//           onClick={() => {
+//             firebase.auth().signInWithEmailAndPassword(email, passw);
+//           }}
+//         >
+//           Sign In with email and password
+//         </button>
 
-        <button
-          onClick={() => {
-            const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(googleAuthProvider);
-          }}
-        >
-          Sign In with Google
-        </button>
-        <button
-          data-testid="signin-anon"
-          onClick={() => {
-            firebase.auth().signInAnonymously();
-          }}
-        >
-          Sign In Anonymously
-        </button>
+//         <button
+//           onClick={() => {
+//             const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
+//             firebase.auth().signInWithPopup(googleAuthProvider);
+//           }}
+//         >
+//           Sign In with Google
+//         </button>
+//         <button
+//           data-testid="signin-anon"
+//           onClick={() => {
+//             firebase.auth().signInAnonymously();
+//           }}
+//         >
+//           Sign In Anonymously
+//         </button>
+//         <button
+//           onClick={() => {
+//             firebase.auth().signOut();
+//           }}
+//         >
+//           Sign Out
+//         </button>
+//         <FirebaseAuthConsumer>
+//           {({ isSignedIn, user, providerId }) => {
+//             return (
+//               <pre style={{ height: 300, overflow: "auto" }}>
+//                 {JSON.stringify({ isSignedIn, user, providerId }, null, 2)}
+//               </pre>
+//             );
+//           }}
+//         </FirebaseAuthConsumer>
+//         <div>
+//           <IfFirebaseAuthed>
+//             {() => {
+//               return <div>You are authenticated</div>;
+//             }}
+//           </IfFirebaseAuthed>
+//           <IfFirebaseAuthedAnd
+//             filter={({ providerId }) => providerId !== "anonymous"}
+//           >
+//             {({ providerId }) => {
+//               return <div>You are authenticated with {providerId}</div>;
+//             }}
+//           </IfFirebaseAuthedAnd>
+//         </div>
+//       </div>
+//     </FirebaseAuthProvider>
+//   );
+// };
+// render(<App />, document.getElementById("ReactRoot"));
+
+function TopBar(props) {
+  return (
+    <div className="top-bar">
+      <div style={{ display: "flex" }}>
+        <p>{props.displayName}</p>
         <button
           onClick={() => {
             firebase.auth().signOut();
@@ -349,31 +391,47 @@ const App = () => {
         >
           Sign Out
         </button>
-        <FirebaseAuthConsumer>
-          {({ isSignedIn, user, providerId }) => {
-            return (
-              <pre style={{ height: 300, overflow: "auto" }}>
-                {JSON.stringify({ isSignedIn, user, providerId }, null, 2)}
-              </pre>
-            );
-          }}
-        </FirebaseAuthConsumer>
-        <div>
-          <IfFirebaseAuthed>
-            {() => {
-              return <div>You are authenticated</div>;
-            }}
-          </IfFirebaseAuthed>
-          <IfFirebaseAuthedAnd
-            filter={({ providerId }) => providerId !== "anonymous"}
-          >
-            {({ providerId }) => {
-              return <div>You are authenticated with {providerId}</div>;
-            }}
-          </IfFirebaseAuthedAnd>
-        </div>
       </div>
-    </FirebaseAuthProvider>
+    </div>
   );
-};
-// render(<App />, document.getElementById("ReactRoot"));
+}
+
+//////////////////////
+/// MAIN WINDOW
+//////////////////////
+class Main extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return <TopBar displayName={this.props.user.displayName} />;
+  }
+}
+
+
+//////////////////////
+/// APP
+//////////////////////
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: { uid: null, displayName: "", isAdmin: false },
+    };
+    this.handleUserChange = this.handleUserChange.bind(this);
+  }
+  handleUserChange(_uid, _displayName, _isAdmin) {
+    this.setState({
+      user: { uid: _uid, displayName: _displayName, isAdmin: _isAdmin },
+    });
+  }
+
+  render() {
+    const content = this.state.user.uid ? (
+      <Main user={this.state.user} />
+    ) : (
+      <AuthForm onUserChange={this.handleUserChange} />
+    );
+    return <div>{content}</div>;
+  }
+}
