@@ -1,5 +1,4 @@
 import * as React from "react";
-import { render } from "react-dom";
 import firebase from "firebase/app";
 import "firebase/auth";
 import {
@@ -9,43 +8,10 @@ import {
   IfFirebaseAuthedAnd,
 } from "@react-firebase/auth";
 import { config } from "./firebaseConfig";
+import { Gathering } from "./gathering";
 
 const email = "d.suppo@issimissimo.com";
 const passw = "123456";
-
-function LogOut(props) {
-  return <button>Sign Out</button>;
-}
-
-function showUserData(data) {
-  console.log(data);
-}
-
-function aaaa() {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve("ciao zio!");
-    }, 2000);
-  });
-}
-
-/// this function is quite strange...
-/// it is called when a FB user has changed authenticatication parameters,
-/// and at very start!
-/// but we need it to proceed after logging
-/// to create the room...
-// firebase.auth().onAuthStateChanged(user => {
-
-// })
-
-// setTimeout(()=>{
-//     firebase.auth().onAuthStateChanged(function (user) {
-//         console.log('***************')
-//         console.log('your id is:')
-//         console.log(user.uid)
-//         console.log('***************')
-//     });
-// },500)
 
 //////////////////////
 /// LOGIN FORM
@@ -129,18 +95,13 @@ class AuthForm extends React.Component {
       LOGIN: "login",
     };
 
-    // this.user = {
-    //   uid: "",
-    //   displayName: "",
-    //   isAdmin: false,
-    // };
-
     this.state = {
       authState: this.AUTH_STATE.LOGIN,
       email: "",
       password: "",
       firstName: "",
       lastName: "",
+      errorMessage: null,
     };
 
     this.changeAuthState = this.changeAuthState.bind(this);
@@ -148,7 +109,9 @@ class AuthForm extends React.Component {
     this.handleChangePassword = this.handleChangePassword.bind(this);
     this.handleChangeFirstName = this.handleChangeFirstName.bind(this);
     this.handleChangeLastName = this.handleChangeLastName.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
     this.login = this.login.bind(this);
+    this.register = this.register.bind(this);
   }
 
   componentDidMount() {
@@ -184,16 +147,6 @@ class AuthForm extends React.Component {
     this.setState({ authState: newAuthState });
   }
 
-  login() {
-    const email = this.state.email;
-    const password = this.state.password;
-    firebase.auth().signInWithEmailAndPassword(email, password);
-  }
-
-  logout() {
-    firebase.auth().signOut();
-  }
-
   handleChangeEmail(event) {
     this.setState({ email: event.target.value });
   }
@@ -210,18 +163,29 @@ class AuthForm extends React.Component {
     this.setState({ lastName: event.target.value });
   }
 
-  //   handleSubmit() {
-  //     if (this.state.authState === this.AUTH_STATE.LOGIN) this.login();
-  //     else this.register();
-  //   }
+  handleSubmit() {
+    if (this.state.authState === this.AUTH_STATE.LOGIN) this.login();
+    else this.register();
+  }
 
-  //   login() {
-  //     console.log("login....");
-  //   }
+  login() {
+    const email = this.state.email;
+    const password = this.state.password;
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .then((cred) => {
+        this.setState({ errorMessage: null });
+      })
+      .catch((err) => {
+        console.error(err.message);
+        this.setState({ errorMessage: err.message });
+      });
+  }
 
-  //   register() {
-  //     console.log("register....");
-  //   }
+  register() {
+    console.log("register....");
+  }
 
   render() {
     /// change auth state
@@ -262,13 +226,15 @@ class AuthForm extends React.Component {
       );
     }
 
+    const error = this.state.errorMessage;
+
     return (
       <div className="container">
         {form}
 
         <FirebaseAuthProvider {...config} firebase={firebase}>
           <div>
-            <button onClick={this.login}>SUBMIT</button>
+            <button onClick={this.handleSubmit}>SUBMIT</button>
 
             <FirebaseAuthConsumer>
               {({ isSignedIn, user, providerId }) => {
@@ -299,7 +265,7 @@ class AuthForm extends React.Component {
           </div>
         </FirebaseAuthProvider>
 
-        {/* <button onClick={this.handleSubmit}>SUBMIT</button> */}
+        {error && <p style={{ color: "red" }}>{error}</p>}
 
         <p>{changeAuthStateText}</p>
         <button onClick={this.changeAuthState}>
@@ -380,17 +346,14 @@ class AuthForm extends React.Component {
 // render(<App />, document.getElementById("ReactRoot"));
 
 function TopBar(props) {
+  const logout = () => {
+    firebase.auth().signOut();
+  };
   return (
     <div className="top-bar">
       <div style={{ display: "flex" }}>
         <p>{props.displayName}</p>
-        <button
-          onClick={() => {
-            firebase.auth().signOut();
-          }}
-        >
-          Sign Out
-        </button>
+        <button onClick={logout}>Sign Out</button>
       </div>
     </div>
   );
@@ -407,7 +370,6 @@ class Main extends React.Component {
     return <TopBar displayName={this.props.user.displayName} />;
   }
 }
-
 
 //////////////////////
 /// APP
