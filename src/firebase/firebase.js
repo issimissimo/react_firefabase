@@ -10,6 +10,7 @@ import {
 } from "@react-firebase/auth";
 import { config } from "./firebaseConfig";
 import { Gathering } from "./gathering";
+import * as UI from "../UI/buttons";
 
 //////////////////////
 /// LOGIN FORM
@@ -28,9 +29,7 @@ class LoginForm extends React.Component {
     firebase
       .auth()
       .signInWithEmailAndPassword(this.state.email, this.state.password)
-      .then((cred) => {
-        // this.setState({ errorMessage: null });
-      })
+      .then((cred) => {})
       .catch((err) => {
         this.handleError(err.message);
       });
@@ -69,7 +68,7 @@ class LoginForm extends React.Component {
               onChange={this.handleChangePassword}
             />
           </label>
-          <Bttn_Submit onSubmit={this.login} error={this.state.error} />
+          <UI.Bttn_Submit onSubmit={this.login} error={this.state.error} />
 
           {/*print error */}
           {this.state.error && (
@@ -183,7 +182,7 @@ class RegisterForm extends React.Component {
               onChange={this.handleChangePassword}
             />
           </label>
-          <Bttn_Submit onSubmit={this.register} error={this.state.error} />
+          <UI.Bttn_Submit onSubmit={this.register} error={this.state.error} />
 
           {/*print error */}
           {this.state.error && (
@@ -198,56 +197,28 @@ class RegisterForm extends React.Component {
   }
 }
 
-class Bttn_Submit extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { clicked: false };
-  }
-
-  componentDidUpdate() {
-    if (this.props.error && this.state.clicked) {
-      this.setState({ clicked: false });
-    }
-  }
-
-  render() {
-    let content;
-    if (!this.state.clicked) {
-      content = (
-        <button
-          onClick={() => {
-            this.setState({ clicked: true });
-            this.props.onSubmit();
-          }}
-        >
-          SUBMIT
-        </button>
-      );
-    } else {
-      content = <p>Submitting....</p>;
-    }
-
-    return <div className="bttn-submit">{content}</div>;
-  }
-}
-
 //////////////////////
 /// JOIN FORM
 //////////////////////
 class JoinForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { error: null };
+    this.state = { fullName: "", error: null };
     this.join = this.join.bind(this);
+    this.handleChangeFullName = this.handleChangeFullName.bind(this);
     this.handleError = this.handleError.bind(this);
   }
 
-  join() {
-    firebase.auth().signInAnonymously();
+  handleChangeFullName(event) {
+    this.setState({ fullName: event.target.value, error: null });
   }
 
   handleError() {
     this.setState({ error: "error message" });
+  }
+
+  join() {
+    firebase.auth().signInAnonymously();
   }
 
   render() {
@@ -258,23 +229,21 @@ class JoinForm extends React.Component {
           Full name:
           <input
             type="text"
-            value={this.props.fullName}
-            onChange={this.props.onChangeFullName}
+            value={this.state.fullName}
+            onChange={this.handleChangeFullName}
           />
         </label>
-        <Bttn_Submit onSubmit={this.join} error={this.state.error} />
+        <UI.Bttn_Submit onSubmit={this.join} error={this.state.error} />
+
+        {/*print error */}
+        {this.state.error && <p style={{ color: "red" }}>{this.state.error}</p>}
       </form>
     );
   }
 }
 
-// const joinNew = () => {
-//   console.log("JOIN");
-//   firebase.auth().signInAnonymously();
-// };
-
 //////////////////////
-/// AUTH FORM
+/// AUTH FORM CONTAINER
 //////////////////////
 class AuthForm extends React.Component {
   constructor(props) {
@@ -287,38 +256,19 @@ class AuthForm extends React.Component {
     };
 
     this.state = {
-      authState: "",
-      // email: "",
-      // password: "",
-      // fullName: "",
-      // lastName: "",
-      // errorMessage: null,
+      authState: null,
     };
 
     this.handleChangeAuthState = this.handleChangeAuthState.bind(this);
-    // this.handleChangeEmail = this.handleChangeEmail.bind(this);
-    // this.handleChangePassword = this.handleChangePassword.bind(this);
-    // this.handleChangeFullName = this.handleChangeFullName.bind(this);
-    // this.handleSubmit = this.handleSubmit.bind(this);
-    // this.logout = this.logout.bind(this);
-    // this.register = this.register.bind(this);
-    // this.join = this.join.bind(this);
   }
 
   componentDidMount() {
-    console.log("MOUNT!!!!");
     if (this.props.roomIdToJoin) {
       this.setState({ authState: this.AUTH_STATE.JOIN });
     } else {
       this.setState({ authState: this.AUTH_STATE.LOGIN });
     }
   }
-
-  // componentDidUpdate() {
-  //   console.log("state: " + this.state.authState);
-  // }
-
-  // componentWillUnmount() {}
 
   handleChangeAuthState() {
     const newAuthState =
@@ -329,104 +279,6 @@ class AuthForm extends React.Component {
     this.setState({ authState: newAuthState });
   }
 
-  // handleChangeEmail(event) {
-  //   this.setState({ email: event.target.value, errorMessage: null });
-  // }
-
-  // handleChangePassword(event) {
-  //   this.setState({ password: event.target.value, errorMessage: null });
-  // }
-
-  // handleChangeFullName(event) {
-  //   this.setState({ fullName: event.target.value });
-  // }
-
-  // handleSubmit() {
-  //   if (this.state.authState === this.AUTH_STATE.LOGIN) this.login();
-  //   if (this.state.authState === this.AUTH_STATE.REGISTER) this.register();
-  //   if (this.state.authState === this.AUTH_STATE.JOIN) this.join();
-  // }
-
-  //////
-  // join
-  //////
-  // join() {
-  //   console.log(this.state.fullName);
-  //   // firebase.auth().signInAnonimously();
-  //   joinNew();
-  // }
-
-  //////
-  // login
-  //////
-  // login() {
-  //   firebase
-  //     .auth()
-  //     .signInWithEmailAndPassword(this.state.email, this.state.password)
-  //     .then((cred) => {
-  //       // this.setState({ errorMessage: null });
-  //     })
-  //     .catch((err) => {
-  //       console.error(err.message);
-  //       this.setState({ errorMessage: err.message });
-  //     });
-  // }
-
-  //////
-  // logout
-  //////
-  logout() {
-    this.props.onSignedOut();
-  }
-
-  //////
-  // register
-  //////
-  // register() {
-  //   console.log(">>> START REGISTRATION ----");
-  //   console.log(this.acceptAuthStatusChanged);
-
-  //   if (this.state.firstName == "" || this.state.lastName == "") {
-  //     this.setState({
-  //       errorMessage: "You didn't type First name and Last name",
-  //     });
-  //     return;
-  //   }
-  //   firebase
-  //     .auth()
-  //     .createUserWithEmailAndPassword(this.state.email, this.state.password)
-  //     .then((cred) => {
-  //       // this.setState({ errorMessage: null });
-  //       cred.user
-  //         .updateProfile({
-  //           displayName: this.state.firstName + " " + this.state.lastName,
-  //         })
-  //         .then(() => {
-  //           /// make the user an admin...
-  //           const addAdminRole = firebase
-  //             .functions()
-  //             .httpsCallable("addAdminRole");
-
-  //           addAdminRole({ email: this.state.email })
-  //             .then(() => {
-  //               console.log(
-  //                 this.state.email + " has been registered as Administrator!"
-  //               );
-  //               firebase.auth().signOut();
-  //               this.acceptAuthStatusChanged = true;
-  //               this.login();
-  //             })
-  //             .catch((err) => {
-  //               console.error(err.message);
-  //             });
-  //         });
-  //     })
-  //     .catch((err) => {
-  //       console.error(err.message);
-  //       this.setState({ errorMessage: err.message });
-  //     });
-  // }
-
   render() {
     let form;
     if (this.state.authState === this.AUTH_STATE.LOGIN) {
@@ -436,32 +288,19 @@ class AuthForm extends React.Component {
       form = <RegisterForm onChangeAuthState={this.handleChangeAuthState} />;
     }
     if (this.state.authState === this.AUTH_STATE.JOIN) {
-      form = (
-        <JoinForm
-          fullName={this.state.fullName}
-          onChangeFullName={this.handleChangeFullName}
-          onSubmit={this.join}
-        />
-      );
+      form = <JoinForm />;
     }
 
-    // const error = this.state.errorMessage;
-
-    return (
-      <div className="container">
-        {form}
-
-        {/*print error */}
-        {/* {error && <p style={{ color: "red" }}>{error}</p>} */}
-
-        {/* <p>{changeAuthStateText}</p>
-        <button onClick={this.changeAuthState}>
-          {changeAuthStateBttnText}
-        </button> */}
-      </div>
-    );
+    return <div className="auth-container">{form}</div>;
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////
 /// APP
@@ -482,22 +321,22 @@ export default class App extends React.Component {
               if (providerId !== "anonymous") {
                 return (
                   <div>
-                    <p>SIGNED IN WITH EMAIL AND PASSWORD</p>
+                    {/* <p>SIGNED IN WITH EMAIL AND PASSWORD</p> */}
                     <Main user={user} />
                   </div>
                 );
               } else {
                 return (
                   <div>
-                    <p>SIGNED IN ANONIMOUSLY</p>
-                    <Main />
+                    {/* <p>SIGNED IN ANONIMOUSLY</p> */}
+                    <Main user={user} />
                   </div>
                 );
               }
             }
             return (
               <div>
-                <p>NOT SIGNED IN</p>
+                {/* <p>NOT SIGNED IN</p> */}
                 <AuthForm roomIdToJoin={this.props.roomIdToJoin} />
               </div>
             );
@@ -511,19 +350,18 @@ export default class App extends React.Component {
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 
-function Bttn_SignOut() {
-  const signOut = () => {
-    firebase.auth().signOut();
-  };
-  return <button onClick={signOut}>Sign Out</button>;
-}
-
 function TopBar(props) {
   return (
     <div className="top-bar">
       <div style={{ display: "flex" }}>
         <p>{props.displayName}</p>
-        <Bttn_SignOut />
+        <button
+          onClick={() => {
+            firebase.auth().signOut();
+          }}
+        >
+          Sign Out
+        </button>
       </div>
     </div>
   );
