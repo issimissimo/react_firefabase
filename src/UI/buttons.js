@@ -1,4 +1,7 @@
 import * as React from "react";
+import "./buttons.css";
+
+
 
 export class Bttn_Submit extends React.Component {
     constructor(props) {
