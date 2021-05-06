@@ -25,13 +25,7 @@ const login = (email, password, handleError) => {
     });
 };
 
-
 const register = (fullName, email, password, handleError) => {
-  console.log("register...");
-  if (fullName == "") {
-    handleError("You didn't type your name");
-    return;
-  }
   firebase
     .auth()
     .createUserWithEmailAndPassword(email, password)
@@ -60,7 +54,7 @@ const register = (fullName, email, password, handleError) => {
     .catch((err) => {
       handleError(err.message);
     });
-}
+};
 
 ///
 /// AUTH FORM CONTAINER
@@ -129,17 +123,8 @@ class LoginForm extends React.Component {
   }
 
   handleLogin() {
-    // firebase
-    //   .auth()
-    //   .signInWithEmailAndPassword(this.state.email, this.state.password)
-    //   .then((cred) => {
-    //     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
-    //   })
-    //   .catch((err) => {
-    //     this.handleError(err.message);
-    //   });
     login(this.state.email, this.state.password, (error) => {
-      this.handleError(error)
+      this.handleError(error);
     });
   }
 
@@ -176,7 +161,10 @@ class LoginForm extends React.Component {
               onChange={this.handleChangePassword}
             />
           </label>
-          <UI.Bttn_Submit onSubmit={this.handleLogin} error={this.state.error} />
+          <UI.Bttn_Submit
+            onSubmit={this.handleLogin}
+            error={this.state.error}
+          />
 
           {/*print error */}
           {this.state.error && (
@@ -186,6 +174,7 @@ class LoginForm extends React.Component {
 
         <p>Not registered?</p>
         <button onClick={this.props.onChangeAuthState}>Sign Up</button>
+        <UI.Bttn_Link name="Sign Up"/>
       </div>
     );
   }
@@ -221,48 +210,20 @@ class RegisterForm extends React.Component {
     this.setState({ error: msg });
   }
 
-  handleRegister(){
-    register(this.state.fullName, this.state.email, this.state.password, (error) => {
-      this.handleError(error)
-    });
+  handleRegister() {
+    if (this.state.fullName == "") {
+      this.handleError("You didn't type your name");
+      return;
+    }
+    register(
+      this.state.fullName,
+      this.state.email,
+      this.state.password,
+      (error) => {
+        this.handleError(error);
+      }
+    );
   }
-
-  // register() {
-  //   console.log("register...");
-  //   if (this.state.fullName == "") {
-  //     this.handleError("You didn't type your name");
-  //     return;
-  //   }
-  //   firebase
-  //     .auth()
-  //     .createUserWithEmailAndPassword(this.state.email, this.state.password)
-  //     .then((cred) => {
-  //       // this.setState({ errorMessage: null });
-  //       cred.user
-  //         .updateProfile({
-  //           displayName: this.state.fullName,
-  //         })
-  //         .then(() => {
-  //           /// make the user an admin...
-  //           const addAdminRole = firebase
-  //             .functions()
-  //             .httpsCallable("addAdminRole");
-
-  //           addAdminRole({ email: this.state.email })
-  //             .then(() => {
-  //               /// sign out and sign in... (!)
-  //               firebase.auth().signOut();
-  //               login(this.state.email, this.state.password);
-  //             })
-  //             .catch((err) => {
-  //               this.handleError(err.message);
-  //             });
-  //         });
-  //     })
-  //     .catch((err) => {
-  //       this.handleError(err.message);
-  //     });
-  // }
 
   render() {
     return (
@@ -293,7 +254,10 @@ class RegisterForm extends React.Component {
               onChange={this.handleChangePassword}
             />
           </label>
-          <UI.Bttn_Submit onSubmit={this.handleRegister} error={this.state.error} />
+          <UI.Bttn_Submit
+            onSubmit={this.handleRegister}
+            error={this.state.error}
+          />
 
           {/*print error */}
           {this.state.error && (
@@ -301,7 +265,7 @@ class RegisterForm extends React.Component {
           )}
         </form>
 
-        <p>Already registered?</p>
+        <p>Already registered? <span>UUUU</span> </p>
         <button onClick={this.props.onChangeAuthState}>Sign In</button>
       </div>
     );

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/database";
 import "firebase/functions";
 import {
   FirebaseAuthProvider,
@@ -10,6 +11,7 @@ import {
 } from "@react-firebase/auth";
 import { config } from "./firebaseConfig";
 import { Gathering } from "./gathering";
+import { generateID } from "./generateID";
 
 function TopBar(props) {
   return (
@@ -28,11 +30,69 @@ function TopBar(props) {
   );
 }
 
+const randomName = () => {
+  return Math.random()
+    .toString(36)
+    .replace(/[^a-z]+/g, "")
+    .substr(0, 5);
+};
+
+const test = (count, users) => {
+  console.log(count);
+  console.log(users);
+};
+
 ////////////////////
 /// MAIN WINDOW
 ////////////////////
 function Main({ user }) {
-  return <TopBar displayName={user.displayName} />;
+  let gathering;
+
+  const createRoom = () =>{
+    gathering = new Gathering(firebase.database(), "MyRoom", true, (succes) => {
+      console.log("create gathering");
+      gathering.join(user.uid, user.displayName);
+
+      gathering.onUpdated((count, users) => {
+        test(count, users);
+      });
+    });
+  }
+
+  const joinRoom = () =>{
+    gathering = new Gathering(firebase.database(), "MyRoom", false, (succes) => {
+      console.log("join gathering");
+      gathering.join(user.uid, user.displayName);
+
+      gathering.onUpdated((count, users) => {
+        test(count, users);
+      });
+      
+    
+    });
+  }
+
+  // /// at start
+  // useEffect(() => {
+  //   console.log(user.uid);
+  //   const roomId = randomName();
+  //   gathering = new Gathering(firebase.database(), "MyRoom", true, (succes) => {
+  //     console.log("init gathering");
+  //     gathering.join(user.uid, user.displayName);
+  //     // gathering.onUpdated((count, users) => {
+  //     //   test(count, users);
+  //     // });
+  //   });
+  // }),
+  //   [];
+
+  return (
+    <div>
+      <TopBar displayName={user.displayName} />
+      <button onClick={createRoom}>CREATE</button>
+      <button onClick={joinRoom}>JOIN</button>
+    </div>
+  );
 }
 
 // function Main(props) {
