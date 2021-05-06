@@ -12,11 +12,13 @@ import {
 import { config } from "./firebaseConfig";
 import { Gathering } from "./gathering";
 import { generateID } from "./generateID";
+import UsersList from './UsersList'
 
 function TopBar(props) {
   return (
     <div className="top-bar">
-      <div style={{ display: "flex" }}>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <p>{props.roomID}</p>
         <p>{props.displayName}</p>
         <button
           onClick={() => {
@@ -30,17 +32,50 @@ function TopBar(props) {
   );
 }
 
-const randomName = () => {
-  return Math.random()
-    .toString(36)
-    .replace(/[^a-z]+/g, "")
-    .substr(0, 5);
-};
 
-const test = (count, users) => {
-  console.log(count);
-  console.log(users);
-};
+
+// const UsersList = ({ actualUser }) => {
+//   const [users, setUsers] = useState([]);
+//   let isAdmin = true;
+//   const db = firebase.database();
+
+//   const createGathering = () => {
+//     const gathering = new Gathering(db, "MyRoom", isAdmin, (succes) => {
+//       if (succes) {
+//         console.log("create gathering");
+//         gathering.join(actualUser.uid, actualUser.displayName);
+
+//         /// update users
+//         gathering.onUpdated((newUsers) => {
+//           // const newArrayOfUsers = [...newUsers]
+//           setUsers(newUsers);
+//         });
+//       } else {
+//         console.log("ERROR!!...");
+//       }
+//     });
+//   };
+
+//   return (
+//     <div>
+//       <button onClick={createGathering}>CREATE</button>
+//       <button
+//         onClick={() => {
+//           isAdmin = false;
+//           createGathering();
+//         }}
+//       >
+//         JOIN
+//       </button>
+//       <h2>USERS IN THE ROOM</h2>
+//       <div>
+//         {users.map((user) => (
+//           <p key={user.id}>{user.name}</p>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// };
 
 ////////////////////
 /// MAIN WINDOW
@@ -48,7 +83,7 @@ const test = (count, users) => {
 function Main({ user }) {
   let gathering;
 
-  const createRoom = () =>{
+  const createRoom = () => {
     gathering = new Gathering(firebase.database(), "MyRoom", true, (succes) => {
       console.log("create gathering");
       gathering.join(user.uid, user.displayName);
@@ -57,20 +92,23 @@ function Main({ user }) {
         test(count, users);
       });
     });
-  }
+  };
 
-  const joinRoom = () =>{
-    gathering = new Gathering(firebase.database(), "MyRoom", false, (succes) => {
-      console.log("join gathering");
-      gathering.join(user.uid, user.displayName);
+  const joinRoom = () => {
+    gathering = new Gathering(
+      firebase.database(),
+      "MyRoom",
+      false,
+      (succes) => {
+        console.log("join gathering");
+        gathering.join(user.uid, user.displayName);
 
-      gathering.onUpdated((count, users) => {
-        test(count, users);
-      });
-      
-    
-    });
-  }
+        gathering.onUpdated((count, users) => {
+          test(count, users);
+        });
+      }
+    );
+  };
 
   // /// at start
   // useEffect(() => {
@@ -89,8 +127,9 @@ function Main({ user }) {
   return (
     <div>
       <TopBar displayName={user.displayName} />
-      <button onClick={createRoom}>CREATE</button>
-      <button onClick={joinRoom}>JOIN</button>
+      {/* <button onClick={createRoom}>CREATE</button>
+      <button onClick={joinRoom}>JOIN</button> */}
+      <UsersList actualUser={user} />
     </div>
   );
 }
