@@ -24,8 +24,7 @@ const UserItem = ({ user }) => {
 ///
 /// LIST
 ///
-const UserList = ({ actualUser, onUsersUpdated, onGathering }) => {
-  const [users, setUsers] = useState([]);
+const UserList = ({ actualUser, users, onUsersUpdated, onGathering }) => {
   let isAdmin = true;
   const db = firebase.database();
   const gatheringID = "MyRoom";
@@ -35,14 +34,12 @@ const UserList = ({ actualUser, onUsersUpdated, onGathering }) => {
       if (succes) {
         gathering.join(actualUser.uid, actualUser.displayName);
 
-        /// set the gatheringID in parent component
+        /// set the gatheringID in parent
         onGathering(gatheringID);
 
         /// listen for users updated
         gathering.onUpdated((newUsers) => {
-          setUsers(newUsers);
-
-          /// questo è da fare...
+          /// set users in parent
           onUsersUpdated(newUsers);
         });
       } else {

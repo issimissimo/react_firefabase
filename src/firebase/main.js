@@ -27,11 +27,12 @@ const Main = ({ user }) => {
       <TopBar displayName={user.displayName} roomId={gatheringID} />
       <UserList
         actualUser={user}
+        users={users}
         onGathering={(gatheringID) => {
           setGatheringID(gatheringID);
         }}
         onUsersUpdated={(newUsers) => {
-          console.log("adesso devo portare gli users sù dal parent...")
+          console.log("sto portando gli users sù dal parent...");
           setUsers(newUsers);
         }}
       />
