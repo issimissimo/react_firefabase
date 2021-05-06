@@ -121,7 +121,7 @@ export const Gathering = (function () {
             users.push(newUser);
           }
 
-          console.log(users)
+          // console.log(users)
           
           callback(users);
         //   callback(snap.numChildren(), snap.val());

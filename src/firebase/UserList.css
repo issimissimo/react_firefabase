@@ -1,0 +1,19 @@
+.UserList {
+    width: 500px;
+    margin: 80px auto;
+    background-color: indianred;
+}
+
+.UserList table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.UserItem {
+    background-color: khaki;
+}
+
+.UserItem:hover {
+    background-color: indigo;
+}

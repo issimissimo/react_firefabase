@@ -12,7 +12,7 @@ import {
 import { config } from "./firebaseConfig";
 import { Gathering } from "./gathering";
 import { generateID } from "./generateID";
-import UsersList from './UsersList'
+import UserList from './UserList'
 
 function TopBar(props) {
   return (
@@ -81,76 +81,15 @@ function TopBar(props) {
 /// MAIN WINDOW
 ////////////////////
 function Main({ user }) {
-  let gathering;
-
-  const createRoom = () => {
-    gathering = new Gathering(firebase.database(), "MyRoom", true, (succes) => {
-      console.log("create gathering");
-      gathering.join(user.uid, user.displayName);
-
-      gathering.onUpdated((count, users) => {
-        test(count, users);
-      });
-    });
-  };
-
-  const joinRoom = () => {
-    gathering = new Gathering(
-      firebase.database(),
-      "MyRoom",
-      false,
-      (succes) => {
-        console.log("join gathering");
-        gathering.join(user.uid, user.displayName);
-
-        gathering.onUpdated((count, users) => {
-          test(count, users);
-        });
-      }
-    );
-  };
-
-  // /// at start
-  // useEffect(() => {
-  //   console.log(user.uid);
-  //   const roomId = randomName();
-  //   gathering = new Gathering(firebase.database(), "MyRoom", true, (succes) => {
-  //     console.log("init gathering");
-  //     gathering.join(user.uid, user.displayName);
-  //     // gathering.onUpdated((count, users) => {
-  //     //   test(count, users);
-  //     // });
-  //   });
-  // }),
-  //   [];
 
   return (
     <div>
       <TopBar displayName={user.displayName} />
-      {/* <button onClick={createRoom}>CREATE</button>
-      <button onClick={joinRoom}>JOIN</button> */}
-      <UsersList actualUser={user} />
+      <UserList actualUser={user} />
     </div>
   );
 }
 
-// function Main(props) {
-//   const [count, setCount] = useState(122);
-//   const [happy, setHappy] = useState(true);
-//   const changeHappy = () => {
-//     setHappy(!happy);
-//   };
-//   return (
-//     <>
-//       <p>{count}</p>
-//       <button
-//         onClick={() => {
-//           setCount(count + 1);
-//         }}
-//       ></button>
-//       <h1 onClick={changeHappy}>{happy ? ":)" : ":("}</h1>
-//     </>
-//   );
-// }
+
 
 export default Main;
