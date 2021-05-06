@@ -12,84 +12,28 @@ import {
 import { config } from "./firebaseConfig";
 import { Gathering } from "./gathering";
 import { generateID } from "./generateID";
-import UserList from './UserList'
+import UserList from "./UserList";
+import TopBar from "./TopBar";
 
-function TopBar(props) {
-  return (
-    <div className="top-bar">
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <p>{props.roomID}</p>
-        <p>{props.displayName}</p>
-        <button
-          onClick={() => {
-            firebase.auth().signOut();
-          }}
-        >
-          Sign Out
-        </button>
-      </div>
-    </div>
-  );
-}
-
-
-
-// const UsersList = ({ actualUser }) => {
-//   const [users, setUsers] = useState([]);
-//   let isAdmin = true;
-//   const db = firebase.database();
-
-//   const createGathering = () => {
-//     const gathering = new Gathering(db, "MyRoom", isAdmin, (succes) => {
-//       if (succes) {
-//         console.log("create gathering");
-//         gathering.join(actualUser.uid, actualUser.displayName);
-
-//         /// update users
-//         gathering.onUpdated((newUsers) => {
-//           // const newArrayOfUsers = [...newUsers]
-//           setUsers(newUsers);
-//         });
-//       } else {
-//         console.log("ERROR!!...");
-//       }
-//     });
-//   };
-
-//   return (
-//     <div>
-//       <button onClick={createGathering}>CREATE</button>
-//       <button
-//         onClick={() => {
-//           isAdmin = false;
-//           createGathering();
-//         }}
-//       >
-//         JOIN
-//       </button>
-//       <h2>USERS IN THE ROOM</h2>
-//       <div>
-//         {users.map((user) => (
-//           <p key={user.id}>{user.name}</p>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-////////////////////
-/// MAIN WINDOW
-////////////////////
-function Main({ user }) {
+///
+/// MAIN
+///
+const Main = ({ user }) => {
+  const [roomId, setRoomId] = useState("cippa");
+  const [users, setUsers] = useState([]);
 
   return (
     <div>
-      <TopBar displayName={user.displayName} />
-      <UserList actualUser={user} />
+      <TopBar displayName={user.displayName} roomId={roomId} />
+      <UserList
+        actualUser={user}
+        onUsersUpdated={(newUsers) => {
+          console.log("uhuwghrhghjdfhjb")
+          setUsers(newUsers);
+        }}
+      />
     </div>
   );
-}
-
-
+};
 
 export default Main;

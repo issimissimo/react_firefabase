@@ -1,0 +1,24 @@
+.TopBar {
+    display: flex;
+    justify-content: space-between;
+    background-color: rgb(166, 224, 169);
+    height: 40px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* just for room id  */
+.TopBar p{
+    padding: 0;
+    margin: 0;
+}
+
+.Menu {
+    display: flex;
+    align-items: center;
+}
+
+.Menu p{
+    padding: 0;
+    margin: 0 10px 0 0;
+}

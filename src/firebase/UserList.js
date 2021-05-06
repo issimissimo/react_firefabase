@@ -4,7 +4,9 @@ import "firebase/database";
 import { Gathering } from "./gathering";
 import "./UserList.css";
 
+///
 /// ITEM
+///
 const UserItem = ({ user }) => {
   useEffect(() => {
     console.log(user);
@@ -19,20 +21,26 @@ const UserItem = ({ user }) => {
   );
 };
 
+///
 /// LIST
-const UserList = ({ actualUser }) => {
+///
+const UserList = ({ actualUser, onUsersUpdated }) => {
   const [users, setUsers] = useState([]);
   let isAdmin = true;
   const db = firebase.database();
+  const roomId = "MyRoom";
 
   const createGathering = () => {
-    const gathering = new Gathering(db, "MyRoom", isAdmin, (succes) => {
+    const gathering = new Gathering(db, roomId, isAdmin, (succes) => {
       if (succes) {
         gathering.join(actualUser.uid, actualUser.displayName);
 
-        /// update users
+        /// listen for users updated
         gathering.onUpdated((newUsers) => {
           setUsers(newUsers);
+
+          /// questo è da fare...
+          onUsersUpdated(newUsers);
         });
       } else {
         console.log("ERROR!!...");
