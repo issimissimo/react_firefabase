@@ -19,16 +19,19 @@ import TopBar from "./TopBar";
 /// MAIN
 ///
 const Main = ({ user }) => {
-  const [roomId, setRoomId] = useState("cippa");
+  const [gatheringID, setGatheringID] = useState(null);
   const [users, setUsers] = useState([]);
 
   return (
     <div>
-      <TopBar displayName={user.displayName} roomId={roomId} />
+      <TopBar displayName={user.displayName} roomId={gatheringID} />
       <UserList
         actualUser={user}
+        onGathering={(gatheringID) => {
+          setGatheringID(gatheringID);
+        }}
         onUsersUpdated={(newUsers) => {
-          console.log("uhuwghrhghjdfhjb")
+          console.log("adesso devo portare gli users sù dal parent...")
           setUsers(newUsers);
         }}
       />

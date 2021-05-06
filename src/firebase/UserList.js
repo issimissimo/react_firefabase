@@ -8,9 +8,9 @@ import "./UserList.css";
 /// ITEM
 ///
 const UserItem = ({ user }) => {
-  useEffect(() => {
-    console.log(user);
-  });
+  // useEffect(() => {
+  //   console.log(user);
+  // });
 
   return (
     <tr className="UserItem">
@@ -24,16 +24,19 @@ const UserItem = ({ user }) => {
 ///
 /// LIST
 ///
-const UserList = ({ actualUser, onUsersUpdated }) => {
+const UserList = ({ actualUser, onUsersUpdated, onGathering }) => {
   const [users, setUsers] = useState([]);
   let isAdmin = true;
   const db = firebase.database();
-  const roomId = "MyRoom";
+  const gatheringID = "MyRoom";
 
   const createGathering = () => {
-    const gathering = new Gathering(db, roomId, isAdmin, (succes) => {
+    const gathering = new Gathering(db, gatheringID, isAdmin, (succes) => {
       if (succes) {
         gathering.join(actualUser.uid, actualUser.displayName);
+
+        /// set the gatheringID in parent component
+        onGathering(gatheringID);
 
         /// listen for users updated
         gathering.onUpdated((newUsers) => {

@@ -12,6 +12,7 @@
 
 .UserItem {
     background-color: khaki;
+    cursor: pointer;
 }
 
 .UserItem:hover {
