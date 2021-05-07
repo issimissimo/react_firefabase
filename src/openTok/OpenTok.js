@@ -32,7 +32,7 @@ class OpenTok extends React.Component {
   render() {
     return (
       <div className="OpenTok">
-        <OTSession className="OpenTok"
+        <OTSession
           apiKey={config.apiKey}
           sessionId={config.sessionId}
           token={config.token}

@@ -15,6 +15,12 @@
     left: 0;
     background-color: rgba(0, 0, 0, 0.568);
     z-index: 10;
+    opacity: 0%;
+    transition: opacity 0.5s;
+}
+
+.OTOverlay-Buttons:hover{
+    opacity: 100%;
 }
 
 .OTOverlay-Name{
@@ -30,4 +36,6 @@
     background-color: rgba(0, 0, 0, 0.541);
     display: inline-block;
 }
+
+
 
