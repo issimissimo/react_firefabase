@@ -7,13 +7,19 @@ import "./UserList.css";
 ///
 /// ITEM
 ///
-const UserItem = ({ user }) => {
+const UserItem = ({ user, toggleActiveUser }) => {
   // useEffect(() => {
   //   console.log(user);
   // });
 
   return (
-    <tr className="UserItem" onClick={()=>{console.log(user.uid)}}>
+    <tr
+      className="UserItem"
+      onClick={() => {
+        console.log(user.uid);
+        toggleActiveUser(user.uid);
+      }}
+    >
       <td>{user.name}</td>
       <td>{user.isAdmin.toString()}</td>
       <td>{user.isActive.toString()}</td>
@@ -24,7 +30,7 @@ const UserItem = ({ user }) => {
 ///
 /// LIST
 ///
-const UserList = ({ users }) => {
+const UserList = ({ users, toggleActiveUser }) => {
   return (
     <div className="UserList">
       <h2>USERS IN THE ROOM</h2>
@@ -36,7 +42,11 @@ const UserList = ({ users }) => {
             <th>active</th>
           </tr>
           {users.map((user) => (
-            <UserItem key={user.uid} user={user}/>
+            <UserItem
+              key={user.uid}
+              user={user}
+              toggleActiveUser={toggleActiveUser}
+            />
           ))}
         </tbody>
       </table>

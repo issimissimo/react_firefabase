@@ -42,17 +42,24 @@ export const Gathering = (function () {
       
       if (this.isAdmin) {
         console.log("QUI E' ADMIN")
+
+        this.makeGathering();
+
+        /// ***************************************************
         /// if the room ALREADY EXIST we can't proceed
         /// (this should never happen)
-        if (snapshot.hasChild(roomName)) {
-          console.log("the room already exist!!!")
-          this.success = false;
-          this.callback(this.success);
-        }
-        /// the don't room exist, proceed
-        else {
-          this.makeGathering();
-        }
+        // if (snapshot.hasChild(roomName)) {
+        //   console.log("the room already exist!!!")
+        //   this.success = false;
+        //   this.callback(this.success);
+        // }
+        // /// the don't room exist, proceed
+        // else {
+        //   this.makeGathering();
+        // }
+        /// ***************************************************
+
+
       } else {
         console.log("QUI NON E' ADMIN")
         console.log("cerchiamo se esiste " + roomName)
@@ -92,7 +99,11 @@ export const Gathering = (function () {
       var presenceRef = this.db.ref(".info/connected");
       presenceRef.on("value", function (snap) {
         if (snap.val()) {
-          self.user.onDisconnect().remove();
+          /// *****************************************************
+          /// PER ORA QUESTO LO
+          /// DOBBIAMO DISATTIVARE!!!!
+          // self.user.onDisconnect().remove();
+          /// *****************************************************
           self.user.set({
             name: self.myName,
             isActive: self.isActive,

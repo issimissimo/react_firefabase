@@ -24,6 +24,7 @@ const Main = ({ myUser, roomIdToJoin = null }) => {
   const db = firebase.database();
   const isAdmin = useRef();
   const gathering = useRef();
+  const activeUserUid = useRef();
 
   useEffect(() => {
     myUser.getIdTokenResult().then((idTokenResult) => {
@@ -32,39 +33,10 @@ const Main = ({ myUser, roomIdToJoin = null }) => {
     });
   }, []);
 
-  // /// join room
-  // const joinRoom = () => {
-  //   console.log(isAdmin.current)
-  //   const _roomId = isAdmin.current && !roomIdToJoin ? generateID() : roomIdToJoin;
-  //   gathering.current = new Gathering(db, _roomId, isAdmin.current, (succes) => {
-  //     if (succes) {
-  //       gathering.current.join(myUser.uid, myUser.displayName);
-  //       setRoomId(roomIdToJoin);
-
-  //       /// listen for users updated
-  //       gathering.current.onUpdated((newUsers) => {
-  //         setUsers(newUsers);
-  //       });
-  //     } else {
-  //       console.log("ERROR!!....");
-  //     }
-  //   });
-  // };
-
   /// create gathering
   const joinOrCreateGathering = () => {
     console.log(isAdmin.current);
-    // let _roomId;
-    // if (isAdmin.current) {
-    //   /// if admin, look for a local stored roomId, or generate a new roomId
-    //   // const storedRoomId = window.localStorage.getItem("roomId");
-    //   // const storedRoomId = null;
-    //   _roomId = roomIdToJoin ? roomIdToJoin : generateID();
-    // } else {
-    //   /// if not admin we'll use the receivedRoomId
-    //   console.log("not ADMIN!");
-    //   _roomId = roomIdToJoin;
-    // }
+
     const _roomId =
       isAdmin.current && !roomIdToJoin ? generateID() : roomIdToJoin;
     gathering.current = new Gathering(
@@ -83,6 +55,10 @@ const Main = ({ myUser, roomIdToJoin = null }) => {
 
           /// listen for users updated
           gathering.current.onUpdated((newUsers) => {
+            newUsers.forEach((user) => {
+              console.log(user.isActive);
+              if (user.isActive) activeUserUid.current = user.uid;
+            });
             setUsers(newUsers);
           });
         } else {
@@ -93,10 +69,15 @@ const Main = ({ myUser, roomIdToJoin = null }) => {
   };
 
   const toggleActiveUser = (uid) => {
-    console.log(myUser.uid);
-    gathering.current.room.child(uid).update({
-      isActive: true,
-    });
+    console.log(uid)
+    if (uid !== activeUserUid.current) {
+      gathering.current.room.child(activeUserUid.current).update({
+        isActive: false,
+      });
+      gathering.current.room.child(uid).update({
+        isActive: true,
+      });
+    }
   };
 
   /// onSignOut
@@ -112,7 +93,7 @@ const Main = ({ myUser, roomIdToJoin = null }) => {
   return (
     <div>
       <TopBar user={myUser} roomId={roomId} onSignOut={removeGathering} />
-      <UserList users={users} />
+      <UserList users={users} toggleActiveUser={toggleActiveUser} />
       <button onClick={joinOrCreateGathering}>CREATE</button>
       {/* <button onClick={joinRoom}>JOIN</button> */}
     </div>
