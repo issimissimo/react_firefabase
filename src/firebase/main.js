@@ -56,7 +56,6 @@ const Main = ({ myUser, roomIdToJoin = null }) => {
           /// listen for users updated
           gathering.current.onUpdated((newUsers) => {
             newUsers.forEach((user) => {
-              console.log(user.isActive);
               if (user.isActive) activeUserUid.current = user.uid;
             });
             setUsers(newUsers);
@@ -69,7 +68,6 @@ const Main = ({ myUser, roomIdToJoin = null }) => {
   };
 
   const toggleActiveUser = (uid) => {
-    console.log(uid)
     if (uid !== activeUserUid.current) {
       gathering.current.room.child(activeUserUid.current).update({
         isActive: false,
@@ -86,8 +84,8 @@ const Main = ({ myUser, roomIdToJoin = null }) => {
       gathering.current.over();
     }
 
-    /// clear the storage
-    window.localStorage.clear();
+    // /// clear the storage
+    // window.localStorage.clear();
   };
 
   return (

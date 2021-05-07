@@ -16,7 +16,6 @@ const UserItem = ({ user, toggleActiveUser }) => {
     <tr
       className="UserItem"
       onClick={() => {
-        console.log(user.uid);
         toggleActiveUser(user.uid);
       }}
     >

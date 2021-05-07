@@ -12,6 +12,7 @@ import { config } from "./firebaseConfig";
 import { Gathering } from "./gathering";
 import * as UI from "../UI/buttons";
 import Main from "./main";
+import "./AuthForm.css";
 
 const login = (email, password, handleError) => {
   firebase
@@ -125,7 +126,7 @@ class AuthForm extends React.Component {
       form = <JoinForm />;
     }
 
-    return <div className="auth-container">{form}</div>;
+    return <div className="AuthForm">{form}</div>;
   }
 }
 
@@ -162,7 +163,7 @@ class LoginForm extends React.Component {
 
   render() {
     return (
-      <div>
+      <>
         <form>
           <h1>Sign In</h1>
           <label>
@@ -192,10 +193,13 @@ class LoginForm extends React.Component {
           )}
         </form>
 
-        <p>Not registered?</p>
-        <button onClick={this.props.onChangeAuthState}>Sign Up</button>
-        <UI.Bttn_Link name="Sign Up" />
-      </div>
+        <div className="AuthForm-ChangeState">
+          <p>
+            Not registered?{" "}
+            <span onClick={this.props.onChangeAuthState}>Sign Up</span>
+          </p>
+        </div>
+      </>
     );
   }
 }
@@ -300,10 +304,12 @@ class RegisterForm extends React.Component {
           )}
         </form>
 
-        <p>
-          Already registered? <span>UUUU</span>{" "}
-        </p>
-        <button onClick={this.props.onChangeAuthState}>Sign In</button>
+        <div className="AuthForm-ChangeState">
+          <p>
+            Already registered?{" "}
+            <span onClick={this.props.onChangeAuthState}>Sign In</span>
+          </p>
+        </div>
       </div>
     );
   }
@@ -399,13 +405,15 @@ export default class App extends React.Component {
                   </div>
                 );
               }
+            } else {
+              console.log("NOT SIGNED");
+              return (
+                <div>
+                  {/* <p>NOT SIGNED IN</p> */}
+                  <AuthForm roomIdToJoin={this.props.roomIdToJoin} />
+                </div>
+              );
             }
-            return (
-              <div>
-                {/* <p>NOT SIGNED IN</p> */}
-                <AuthForm roomIdToJoin={this.props.roomIdToJoin} />
-              </div>
-            );
           }}
         </FirebaseAuthConsumer>
       </FirebaseAuthProvider>

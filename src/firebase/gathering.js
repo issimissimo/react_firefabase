@@ -104,6 +104,13 @@ export const Gathering = (function () {
           /// DOBBIAMO DISATTIVARE!!!!
           // self.user.onDisconnect().remove();
           /// *****************************************************
+          
+          /// si discollega automaticamente dal gathering
+          /// solo se non è admin
+          if (!self.isAdmin){
+            self.user.onDisconnect().remove();
+          }
+
           self.user.set({
             name: self.myName,
             isActive: self.isActive,

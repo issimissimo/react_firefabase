@@ -34,24 +34,24 @@ export class Bttn_Submit extends React.Component {
   }
 }
 
-export function Bttn_Link({ name, onClick }) {
-  const [isOver, setIsOver] = useState(false);
-  const styles = [
-    { color: "black" },
-    { color: "blue", textDecoration: "underline" },
-  ];
-  const defStyle = { cursor: "pointer" };
-  const changeStyle = () => {
-    setIsOver(!isOver);
-  };
-  return (
-    <p
-      style={Object.assign(defStyle, isOver ? styles[1] : styles[0])}
-      onClick={onClick}
-      onMouseOver={changeStyle}
-      onMouseLeave={changeStyle}
-    >
-      {name}
-    </p>
-  );
-}
+// export function Bttn_Link({ name, onClick }) {
+//   const [isOver, setIsOver] = useState(false);
+//   const styles = [
+//     { color: "black" },
+//     { color: "blue", textDecoration: "underline" },
+//   ];
+//   const defStyle = { cursor: "pointer" };
+//   const changeStyle = () => {
+//     setIsOver(!isOver);
+//   };
+//   return (
+//     <p
+//       style={Object.assign(defStyle, isOver ? styles[1] : styles[0])}
+//       onClick={onClick}
+//       onMouseOver={changeStyle}
+//       onMouseLeave={changeStyle}
+//     >
+//       {name}
+//     </p>
+//   );
+// }

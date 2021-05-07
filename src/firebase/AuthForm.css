@@ -1,0 +1,26 @@
+.AuthForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.AuthForm form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.AuthForm-ChangeState {
+    text-align: center;
+}
+
+.AuthForm-ChangeState span{
+    cursor: pointer;
+    font-size: larger;
+}
+
+.AuthForm-ChangeState span:hover {
+    color: blue;
+    text-decoration: underline;
+}
