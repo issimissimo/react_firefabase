@@ -13,7 +13,7 @@ const UserItem = ({ user }) => {
   // });
 
   return (
-    <tr className="UserItem">
+    <tr className="UserItem" onClick={()=>{console.log(user.id)}}>
       <td>{user.name}</td>
       <td>{user.isAdmin.toString()}</td>
       <td>{user.isActive.toString()}</td>
@@ -24,41 +24,9 @@ const UserItem = ({ user }) => {
 ///
 /// LIST
 ///
-const UserList = ({ actualUser, users, onUsersUpdated, onGathering }) => {
-  let isAdmin = true;
-  const db = firebase.database();
-  const gatheringID = "MyRoom";
-
-  const createGathering = () => {
-    const gathering = new Gathering(db, gatheringID, isAdmin, (succes) => {
-      if (succes) {
-        gathering.join(actualUser.uid, actualUser.displayName);
-
-        /// set the gatheringID in parent
-        onGathering(gatheringID);
-
-        /// listen for users updated
-        gathering.onUpdated((newUsers) => {
-          /// set users in parent
-          onUsersUpdated(newUsers);
-        });
-      } else {
-        console.log("ERROR!!...");
-      }
-    });
-  };
-
+const UserList = ({ users }) => {
   return (
     <div className="UserList">
-      <button onClick={createGathering}>CREATE</button>
-      <button
-        onClick={() => {
-          isAdmin = false;
-          createGathering();
-        }}
-      >
-        JOIN
-      </button>
       <h2>USERS IN THE ROOM</h2>
       <table>
         <tbody>
@@ -68,7 +36,7 @@ const UserList = ({ actualUser, users, onUsersUpdated, onGathering }) => {
             <th>active</th>
           </tr>
           {users.map((user) => (
-            <UserItem key={user.id} user={user} />
+            <UserItem key={user.uid} user={user}/>
           ))}
         </tbody>
       </table>

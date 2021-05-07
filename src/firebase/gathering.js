@@ -99,13 +99,19 @@ export const Gathering = (function () {
 
     this.leave = function () {
       if (this.user) {
+        console.log("remove")
         this.user.remove();
         this.user = null;
         this.myName = "";
       }
     };
 
+    // this.remove = function(id){
+
+    // }
+
     this.over = function () {
+      console.log("over")
       this.room.remove();
     };
 
@@ -117,7 +123,7 @@ export const Gathering = (function () {
           const result = snap.val();
           for (let id in result) {
             let newUser = result[id];
-            newUser.id = id;
+            newUser.uid = id;
             users.push(newUser);
           }
 

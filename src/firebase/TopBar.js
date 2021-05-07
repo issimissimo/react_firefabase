@@ -7,13 +7,14 @@ import "./TopBar.css";
 ///
 /// MENU
 ///
-const Menu = (props) => {
+const Menu = ({user, onSignOut}) => {
   return (
     <div className="Menu">
-      <p>{props.displayName}</p>
+      <p>{user.displayName}</p>
       <button
         onClick={() => {
           firebase.auth().signOut();
+          onSignOut();
         }}
       >
         Sign Out
@@ -25,11 +26,11 @@ const Menu = (props) => {
 ///
 /// TOP BAR
 ///
-const TopBar = (props) => {
+const TopBar = ({user, roomId, onSignOut}) => {
   return (
     <div className="TopBar">
-      <p>{props.roomId}</p>
-      <Menu displayName={props.displayName}/>
+      <p>{roomId}</p>
+      <Menu user={user} onSignOut={onSignOut}/>
     </div>
   );
 };

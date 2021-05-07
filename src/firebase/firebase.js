@@ -348,14 +348,14 @@ export default class App extends React.Component {
                 return (
                   <div>
                     {/* <p>SIGNED IN WITH EMAIL AND PASSWORD</p> */}
-                    <Main user={user} />
+                    <Main myUser={user} />
                   </div>
                 );
               } else {
                 return (
                   <div>
                     {/* <p>SIGNED IN ANONIMOUSLY</p> */}
-                    <Main user={user} />
+                    <Main myUser={user} />
                   </div>
                 );
               }
