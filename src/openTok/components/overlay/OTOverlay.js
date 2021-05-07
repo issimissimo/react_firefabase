@@ -1,25 +1,74 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import MicIcon from "@material-ui/icons/Mic";
+import MicOffIcon from "@material-ui/icons/MicOff";
+import VideocamIcon from "@material-ui/icons/Videocam";
+import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 import "./OTOverlay.css";
 
+///
+/// audio off
+///
+const AudioOff = () => {
+  return (
+    <div className="AudioOff">
+      <MicOffIcon color="error" />
+    </div>
+  );
+};
 
-const NoAudio = () =>{
-    return(
-        <p>No audio</p>
-    )
-}
+///
+/// toggle button
+///
+const ToggleBttn = ({ icons, enabled, onClicked }) => {
+  if (enabled)
+    return (
+      <div className="ToggleBttn" onClick={onClicked}>
+        {icons[0]}
+      </div>
+    );
+  return (
+    <div className="ToggleBttn" onClick={onClicked}>
+      {icons[1]}
+    </div>
+  );
+};
 
+///
+/// OVERLAY
+///
+const OTOverlay = (props) => {
+  const audioIcons = [
+    <MicIcon htmlColor="#FFFFFF" />,
+    <MicOffIcon htmlColor="#A8A8A8" />,
+  ];
+  const videoIcons = [
+    <VideocamIcon htmlColor="#FFFFFF" />,
+    <VideocamOffIcon htmlColor="#A8A8A8" />,
+  ];
 
-const OTOverlay = ({ name }) => {
-  const [video, setVideo] = useState(true);
-  const [audio, setAudio] = useState(false);
+  const audioToggleBttn = (
+    <ToggleBttn
+      icons={audioIcons}
+      enabled={props.audio}
+      onClicked={props.toggleAudio}
+    />
+  );
+  const videoToggleBttn = (
+    <ToggleBttn
+      icons={videoIcons}
+      enabled={props.video}
+      onClicked={props.toggleVideo}
+    />
+  );
   return (
     <div className="OTOverlay">
-      {!audio && <NoAudio />}
+      {!props.audio && <AudioOff />}
       <div className="OTOverlay-Buttons">
-        <button></button>
+        {audioToggleBttn}
+        {videoToggleBttn}
       </div>
       <div className="OTOverlay-Name">
-        <p>{name}</p>
+        <p>{props.name}</p>
       </div>
     </div>
   );

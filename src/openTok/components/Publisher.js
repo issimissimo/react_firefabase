@@ -1,11 +1,7 @@
 import React, { Component } from "react";
-
-// import { OTPublisher } from '../../src'
 import { OTPublisher } from "opentok-react";
-import RadioButtons from "./RadioButtons";
-import CheckBox from "./CheckBox";
+import OTOverlay from "./overlay/OTOverlay";
 import "./VideoContainer.css";
-import OTOverlay from "./overlay/OTOverlay"
 
 export default class Publisher extends Component {
   constructor(props) {
@@ -30,28 +26,39 @@ export default class Publisher extends Component {
         console.log(event.element);
       },
     };
+
+    this.toggleAudio = this.toggleAudio.bind(this);
+    this.toggleVideo = this.toggleVideo.bind(this);
   }
 
-  setAudio = (audio) => {
-    this.setState({ audio });
+  toggleAudio = () => {
+    console.log("toggle audio")
+    this.setState({ audio: !this.state.audio });
   };
 
-  setVideo = (video) => {
-    this.setState({ video });
+  toggleVideo = () => {
+    this.setState({ video: !this.state.video });
   };
 
-  setVideoSource = (videoSource) => {
-    this.setState({ videoSource });
-  };
+  // setVideoSource = (videoSource) => {
+  //   this.setState({ videoSource });
+  // };
 
   onError = (err) => {
+    console.error(err);
     this.setState({ error: `Failed to publish: ${err.message}` });
   };
 
   render() {
     return (
       <div className="VideoContainer">
-        <OTOverlay name='Daniele Suppo'/>
+        <OTOverlay
+          name="Daniele Suppo"
+          audio={this.state.audio}
+          video={this.state.video}
+          toggleAudio={this.toggleAudio}
+          toggleVideo={this.toggleVideo}
+        />
         <OTPublisher
           properties={{
             publishAudio: this.state.audio,

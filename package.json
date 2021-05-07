@@ -28,6 +28,8 @@
     "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.4",
+    "@material-ui/icons": "^4.11.2",
     "@react-firebase/auth": "^0.2.10",
     "@react-firebase/database": "^0.3.11",
     "firebase": "^8.4.2",

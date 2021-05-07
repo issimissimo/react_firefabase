@@ -1,41 +1,60 @@
 .OTOverlay {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 9;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9;
 }
 
-.OTOverlay-Buttons{
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.568);
-    z-index: 10;
-    opacity: 0%;
-    transition: opacity 0.5s;
+.OTOverlay-Buttons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.568);
+  z-index: 10;
+  opacity: 0%;
+  transition: opacity 0.5s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.OTOverlay-Buttons:hover{
-    opacity: 100%;
+.OTOverlay-Buttons:hover {
+  opacity: 100%;
 }
 
-.OTOverlay-Name{
-    position: absolute;
-    bottom: 0;
-    left: 0;
+.OTOverlay-Name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  font-size: 13px;
 }
 
-.OTOverlay-Name p{
-    margin: 0;
-    padding: 5 10 5 10;
-    color: lightgray;
-    background-color: rgba(0, 0, 0, 0.541);
-    display: inline-block;
+.OTOverlay-Name p {
+  margin: 0;
+  padding: 5 10 5 10;
+  color: lightgray;
+  background-color: rgba(0, 0, 0, 0.541);
+  display: inline-block;
 }
 
+.AudioOff {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 5px;
+}
 
+.ToggleBttn {
+  padding: 5px;
+  margin: 5px;
+  cursor: pointer;
+}
 
+.ToggleBttn:hover {
+  border-radius: 50%;
+  background-color: black;
+}
