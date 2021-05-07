@@ -1,0 +1,33 @@
+.OTOverlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 9;
+}
+
+.OTOverlay-Buttons{
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.568);
+    z-index: 10;
+}
+
+.OTOverlay-Name{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.OTOverlay-Name p{
+    margin: 0;
+    padding: 5 10 5 10;
+    color: lightgray;
+    background-color: rgba(0, 0, 0, 0.541);
+    display: inline-block;
+}
+

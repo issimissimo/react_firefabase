@@ -11,13 +11,15 @@ import ReactDOM from "react-dom";
 
 import App from "./firebase/firebase";
 
+import OpenTok from "./openTok/OpenTok";
+
 
 let roomIdToJoin = null;
 roomIdToJoin = "-M_53BX7Ob5wtzk3CN5J";
 
 
 ReactDOM.render(
-  <App roomIdToJoin={roomIdToJoin}/>,
+  <OpenTok roomIdToJoin={roomIdToJoin}/>,
   document.getElementById("ReactRoot")
 );
 
