@@ -25,7 +25,7 @@ const login = (email, password, handleError) => {
     });
 };
 
-const register = (fullName, email, password, handleError) => {
+const register = (fullName, email, password, isAdmin, handleError) => {
   firebase
     .auth()
     .createUserWithEmailAndPassword(email, password)
@@ -35,20 +35,39 @@ const register = (fullName, email, password, handleError) => {
           displayName: fullName,
         })
         .then(() => {
-          /// make the user an admin...
-          const addAdminRole = firebase
-            .functions()
-            .httpsCallable("addAdminRole");
+          if (isAdmin) {
+            /// make the user an admin...
+            const addAdminRole = firebase
+              .functions()
+              .httpsCallable("addAdminRole");
 
-          addAdminRole({ email: email })
-            .then(() => {
-              /// sign out and sign in... (!)
-              firebase.auth().signOut();
-              login(email, password);
-            })
-            .catch((err) => {
-              handleError(err.message);
-            });
+            addAdminRole({ email: email })
+              .then(() => {
+                /// sign out and sign in... (!)
+                firebase.auth().signOut();
+                login(email, password);
+              })
+              .catch((err) => {
+                handleError(err.message);
+              });
+          } else {
+            firebase.auth().signOut();
+            login(email, password);
+          }
+          // /// make the user an admin...
+          // const addAdminRole = firebase
+          //   .functions()
+          //   .httpsCallable("addAdminRole");
+
+          // addAdminRole({ email: email })
+          //   .then(() => {
+          //     /// sign out and sign in... (!)
+          //     firebase.auth().signOut();
+          //     login(email, password);
+          //   })
+          //   .catch((err) => {
+          //     handleError(err.message);
+          //   });
         });
     })
     .catch((err) => {
@@ -77,11 +96,12 @@ class AuthForm extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.roomIdToJoin) {
-      this.setState({ authState: this.AUTH_STATE.JOIN });
-    } else {
-      this.setState({ authState: this.AUTH_STATE.LOGIN });
-    }
+    // if (this.props.roomIdToJoin) {
+    //   this.setState({ authState: this.AUTH_STATE.JOIN });
+    // } else {
+    //   this.setState({ authState: this.AUTH_STATE.LOGIN });
+    // }
+    this.setState({ authState: this.AUTH_STATE.LOGIN });
   }
 
   handleChangeAuthState() {
@@ -174,7 +194,7 @@ class LoginForm extends React.Component {
 
         <p>Not registered?</p>
         <button onClick={this.props.onChangeAuthState}>Sign Up</button>
-        <UI.Bttn_Link name="Sign Up"/>
+        <UI.Bttn_Link name="Sign Up" />
       </div>
     );
   }
@@ -186,12 +206,19 @@ class LoginForm extends React.Component {
 class RegisterForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { fullName: "", email: "", password: "", error: null };
+    this.state = {
+      fullName: "",
+      email: "",
+      password: "",
+      isAdmin: false,
+      error: null,
+    };
     this.handleChangeFullName = this.handleChangeFullName.bind(this);
     this.handleChangeEmail = this.handleChangeEmail.bind(this);
     this.handleChangePassword = this.handleChangePassword.bind(this);
     this.handleError = this.handleError.bind(this);
     this.handleRegister = this.handleRegister.bind(this);
+    this.handleChangeIsAdmin = this.handleChangeIsAdmin.bind(this);
   }
 
   handleChangeFullName(event) {
@@ -206,6 +233,8 @@ class RegisterForm extends React.Component {
     this.setState({ password: event.target.value, error: null });
   }
 
+  handleChangeIsAdmin(event) {}
+
   handleError(msg) {
     this.setState({ error: msg });
   }
@@ -219,6 +248,7 @@ class RegisterForm extends React.Component {
       this.state.fullName,
       this.state.email,
       this.state.password,
+      this.state.isAdmin,
       (error) => {
         this.handleError(error);
       }
@@ -254,6 +284,11 @@ class RegisterForm extends React.Component {
               onChange={this.handleChangePassword}
             />
           </label>
+          <label>
+            {" "}
+            Is Admin
+            <input type="checkbox" onChange={this.handleChangeIsAdmin} />
+          </label>
           <UI.Bttn_Submit
             onSubmit={this.handleRegister}
             error={this.state.error}
@@ -265,7 +300,9 @@ class RegisterForm extends React.Component {
           )}
         </form>
 
-        <p>Already registered? <span>UUUU</span> </p>
+        <p>
+          Already registered? <span>UUUU</span>{" "}
+        </p>
         <button onClick={this.props.onChangeAuthState}>Sign In</button>
       </div>
     );
@@ -348,7 +385,10 @@ export default class App extends React.Component {
                 return (
                   <div>
                     {/* <p>SIGNED IN WITH EMAIL AND PASSWORD</p> */}
-                    <Main myUser={user} />
+                    <Main
+                      myUser={user}
+                      roomIdToJoin={this.props.roomIdToJoin}
+                    />
                   </div>
                 );
               } else {

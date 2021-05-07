@@ -39,10 +39,13 @@ export const Gathering = (function () {
     /// depending if we are admin or not
     var _room = this.db.ref("gatherings");
     _room.once("value").then((snapshot) => {
+      
       if (this.isAdmin) {
+        console.log("QUI E' ADMIN")
         /// if the room ALREADY EXIST we can't proceed
         /// (this should never happen)
         if (snapshot.hasChild(roomName)) {
+          console.log("the room already exist!!!")
           this.success = false;
           this.callback(this.success);
         }
@@ -51,8 +54,12 @@ export const Gathering = (function () {
           this.makeGathering();
         }
       } else {
+        console.log("QUI NON E' ADMIN")
+        console.log("cerchiamo se esiste " + roomName)
         /// if the room don't exist we can't proceed
         if (!snapshot.hasChild(roomName)) {
+          console.log("NON ESISTE!")
+          console.log(snapshot.val())
           this.success = false;
           this.callback(this.success);
         }

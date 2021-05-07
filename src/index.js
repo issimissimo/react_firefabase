@@ -13,7 +13,7 @@ import App from "./firebase/firebase";
 
 
 let roomIdToJoin = null;
-// roomIdToJoin = "1234";
+roomIdToJoin = "-M_53BX7Ob5wtzk3CN5J";
 
 
 ReactDOM.render(

@@ -13,7 +13,7 @@ const UserItem = ({ user }) => {
   // });
 
   return (
-    <tr className="UserItem" onClick={()=>{console.log(user.id)}}>
+    <tr className="UserItem" onClick={()=>{console.log(user.uid)}}>
       <td>{user.name}</td>
       <td>{user.isAdmin.toString()}</td>
       <td>{user.isActive.toString()}</td>
