@@ -45,8 +45,8 @@ export default class Publisher extends Component {
     this.setState({ video: !this.state.video });
   };
 
-  componentDidUpdate(){
-    console.log("DID UPDATE PUBLISHER!")
+  componentDidUpdate() {
+    console.log("DID UPDATE PUBLISHER!");
   }
 
   // setVideoSource = (videoSource) => {
@@ -70,6 +70,7 @@ export default class Publisher extends Component {
           toggleVideo={this.toggleVideo}
         />
         <OTPublisher
+          session={this.props.session}
           properties={{
             publishAudio: this.state.audio,
             publishVideo: this.state.video,
@@ -81,7 +82,7 @@ export default class Publisher extends Component {
             resolution: "320x240",
             frameRate: 15,
             name: this.props.name,
-            id: "kjkdjkjkdhj",
+            custom: "myCustomProperty"
           }}
           eventHandlers={this.publisherEventHandlers}
           onError={this.onError}

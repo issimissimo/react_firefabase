@@ -8,9 +8,9 @@
   overflow: auto;
 }
 
-.OpenTok > div {
+/* .OpenTok > div {
   display: flex;
-}
+} */
 
 .Streams > div {
   display: flex;

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { OTSession, OTStreams } from "opentok-react";
+import { OTSession, OTStreams, createSession } from "opentok-react";
 import { config } from "./config";
 import Publisher from "./components/Publisher";
 import Subscriber from "./components/Subscriber";
 import "./OpenTok.css";
 
-class OpenTok extends React.Component {
+class _OpenTok extends React.Component {
   constructor(props) {
     super(props);
 
@@ -39,8 +39,8 @@ class OpenTok extends React.Component {
       streamCreated: (event) => {
         console.log("STREAM CREATED");
         console.log(event.stream.id);
-        this.setState({newSubscriberId: event.stream.id})
-      }
+        this.setState({ newSubscriberId: event.stream.id });
+      },
     };
   }
 
@@ -91,7 +91,7 @@ class OpenTok extends React.Component {
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-class _OpenTok extends React.Component {
+class OpenTok extends React.Component {
   constructor(props) {
     super(props);
     this.state = { streams: [] };
@@ -102,7 +102,22 @@ class _OpenTok extends React.Component {
       apiKey: config.apiKey,
       sessionId: config.sessionId,
       token: config.token,
-      onStreamsUpdated: streams => { this.setState({ streams }); }
+      onStreamsUpdated: (streams) => {
+        this.setState({ streams });
+      },
+    });
+
+    this.sessionHelper.session.on("streamPropertyChanged", (event) => {
+      console.log("CAMBIATO");
+      console.log(this.state.streams);
+      const newStreams = this.state.streams.map((stream) => {
+        if (stream.id === event.stream.id) {
+          // return { ...stream, hasAudio: event.newValue };
+          return event.stream;
+        }
+        return stream;
+      });
+      this.setState({ streams: newStreams });
     });
   }
 
@@ -112,12 +127,12 @@ class _OpenTok extends React.Component {
 
   render() {
     return (
-      <div>
-        <OTPublisher session={this.sessionHelper.session} />
+      <div className="OpenTok">
+        <Publisher session={this.sessionHelper.session} name="Daniele Suppo" />
 
-        {this.state.streams.map(stream => {
+        {this.state.streams.map((stream) => {
           return (
-            <OTSubscriber
+            <Subscriber
               key={stream.id}
               session={this.sessionHelper.session}
               stream={stream}

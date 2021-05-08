@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
-import { OTSubscriber } from 'opentok-react';
+import React, { Component } from "react";
+import { OTSubscriber } from "opentok-react";
 import OTOverlay from "./overlay/OTOverlay";
 import "./VideoContainer.css";
-
 
 export default class Subscriber extends Component {
   constructor(props) {
@@ -10,8 +9,8 @@ export default class Subscriber extends Component {
 
     this.state = {
       error: null,
-      audio: true,
-      video: true
+      // audio: true,
+      // video: true,
     };
 
     this.subscriberEventHandlers = {
@@ -23,15 +22,15 @@ export default class Subscriber extends Component {
     };
   }
 
-  componentDidMount(){
-    console.log("***************************")
-    console.log("DID MOUNT SUBSCRIBER!")
-    console.log(this.props)
-    console.log("***************************")
+  componentDidMount() {
+    console.log("***************************");
+    console.log("DID MOUNT SUBSCRIBER!");
+    console.log(this.props.stream.hasAudio);
+    console.log("***************************");
   }
 
-  componentDidUpdate(){
-    console.log("DID UPDATE SUBSCRIBER!")
+  componentDidUpdate() {
+    console.log("DID UPDATE SUBSCRIBER!");
   }
 
   // setAudio = (audio) => {
@@ -44,18 +43,20 @@ export default class Subscriber extends Component {
 
   onError = (err) => {
     this.setState({ error: `Failed to subscribe: ${err.message}` });
-  }
+  };
 
   render() {
     return (
       <div className="VideoContainer">
         {/* {this.state.error ? <div>{this.state.error}</div> : null} */}
         <OTOverlay
-          type="Subsciber"
+          type="Subscriber"
           name="Subscriber"
-          audio={this.state.audio}
+          audio={this.props.stream.hasAudio}
         />
         <OTSubscriber
+          session={this.props.session}
+          stream={this.props.stream}
           properties={{
             // subscribeToAudio: this.state.audio,
             // subscribeToVideo: this.state.video,
