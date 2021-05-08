@@ -7,11 +7,3 @@
   align-items: center;
   overflow: auto;
 }
-
-/* .OpenTok > div {
-  display: flex;
-} */
-
-.Streams > div {
-  display: flex;
-}

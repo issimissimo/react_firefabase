@@ -15,23 +15,11 @@ export default class Publisher extends Component {
     };
 
     this.publisherEventHandlers = {
-      videoDisabled: (event) => {
-        console.log("Subscriber video disabled!");
-      },
-      videoEnabled: (event) => {
-        console.log("Subscriber video enabled!");
-      },
-      videoElementCreated: (event) => {
-        console.log("video element created");
-      },
-      streamCreated: (event) => {
-        console.log("publisher stream created");
-        console.log(event.stream.id);
-        this.streamId = event.stream.id;
-      },
+      videoDisabled: (event) => {},
+      videoEnabled: (event) => {},
+      videoElementCreated: (event) => {},
+      streamCreated: (event) => {},
     };
-
-    this.streamId = "";
 
     this.toggleAudio = this.toggleAudio.bind(this);
     this.toggleVideo = this.toggleVideo.bind(this);
@@ -44,14 +32,6 @@ export default class Publisher extends Component {
   toggleVideo = () => {
     this.setState({ video: !this.state.video });
   };
-
-  componentDidUpdate() {
-    console.log("DID UPDATE PUBLISHER!");
-  }
-
-  // setVideoSource = (videoSource) => {
-  //   this.setState({ videoSource });
-  // };
 
   onError = (err) => {
     console.error(err);
@@ -82,7 +62,7 @@ export default class Publisher extends Component {
             resolution: "320x240",
             frameRate: 15,
             name: this.props.name,
-            custom: "myCustomProperty"
+            custom: "myCustomProperty",
           }}
           eventHandlers={this.publisherEventHandlers}
           onError={this.onError}

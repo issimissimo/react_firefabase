@@ -1,124 +1,123 @@
-import React, { useState } from "react";
-import { OTSession, OTStreams, createSession } from "opentok-react";
+import React from "react";
+import { createSession } from "opentok-react";
 import { config } from "./config";
 import Publisher from "./components/Publisher";
 import Subscriber from "./components/Subscriber";
 import "./OpenTok.css";
 
-class _OpenTok extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      error: null,
-      connected: false,
-      newSubscriberId: null,
-      streamChanged: null,
-      newStreamValue: null,
+/// generic function to GET from server
+const getFromHttp = (url) => {
+  return new Promise((resolve, reject) => {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status == 200) {
+          var result = xhr.responseText;
+          result = JSON.parse(result);
+          resolve(result);
+        } else {
+          reject(xhr);
+        }
+      }
     };
+    xhr.open("GET", url, true);
+    xhr.send();
+  });
+};
 
-    this.sessionEvents = {
-      sessionConnected: () => {
-        this.setState({ connected: true });
-      },
-      sessionDisconnected: () => {
-        this.setState({ connected: false });
-      },
+const serverUrl = "https://test.issimissimo.com";
+const serverPort = "4000";
 
-      streamPropertyChanged: (event) => {
-        console.log(event.changedProperty);
-        console.log(event.newValue);
-        console.log(event.stream.name);
-        console.log(event.stream.id);
-        this.setState({
-          streamChanged: event.stream.id,
-          newStreamValue: event.newValue,
-        });
-      },
+/// create a new session on the server
+const createSessionOnServer = () => {
+  return new Promise((resolve, reject) => {
+    getFromHttp(serverUrl + ":" + serverPort + "/CreateSession")
+      .then((response) => {
+        /// get sessionId from server
+        const sessionId = response.sessionId;
+        /// save the sessionId on Firebase
+        // FB.db.ref(FB.adminUserId + "/OT/").set({ sessionId: sessionId });
+        resolve(sessionId);
+      })
+      .catch((error) => {
+        console.log("ERROR: " + error);
+      });
+  });
+};
 
-      streamCreated: (event) => {
-        console.log("STREAM CREATED");
-        console.log(event.stream.id);
-        this.setState({ newSubscriberId: event.stream.id });
-      },
-    };
-  }
+/// get a new user token from server
+const getUserTokenFromServer = (sessionId) => {
+  return new Promise((resolve, reject) => {
+    getFromHttp(
+      serverUrl + ":" + serverPort + "/GetToken?sessionId=" + sessionId
+    )
+      .then((response) => {
+        resolve(response);
+      })
+      .catch((error) => {
+        console.log("ERROR: " + error);
+      });
+  });
+};
 
-  componentDidUpdate() {
-    console.log("DID UPDATE SESSION!");
-  }
-
-  onError = (err) => {
-    this.setState({ error: `Failed to connect: ${err.message}` });
-  };
-
-  render() {
-    return (
-      <div className="OpenTok">
-        <OTSession
-          apiKey={config.apiKey}
-          sessionId={config.sessionId}
-          token={config.token}
-          eventHandlers={this.sessionEvents}
-          onError={this.onError}
-        >
-          {/* {this.state.error ? <div>{this.state.error}</div> : null}
-          <ConnectionStatus connected={this.state.connected} /> */}
-          <Publisher name="Daniele Suppo" />
-          <div className="Streams">
-            <OTStreams>
-              <Subscriber />
-            </OTStreams>
-          </div>
-        </OTSession>
-      </div>
-    );
-  }
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-
+///
+/// OPENTOK
+///
 class OpenTok extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { streams: [] };
+    this.state = { streams: [], ready: false };
   }
 
-  componentWillMount() {
-    this.sessionHelper = createSession({
-      apiKey: config.apiKey,
-      sessionId: config.sessionId,
-      token: config.token,
-      onStreamsUpdated: (streams) => {
-        this.setState({ streams });
-      },
+  componentDidMount() {
+    createSessionOnServer().then((sessionId) => {
+      getUserTokenFromServer(sessionId).then((response) => {
+        /// create the session
+        this.sessionHelper = createSession({
+          apiKey: response.apiKey,
+          sessionId: response.sessionId,
+          token: response.token,
+          onStreamsUpdated: (streams) => {
+            this.setState({ streams });
+          },
+        });
+
+        this.sessionHelper.session.on("streamPropertyChanged", (event) => {
+          const newStreams = this.state.streams.map((stream) => {
+            if (stream.id === event.stream.id) {
+              // return { ...stream, hasAudio: event.newValue };
+              return event.stream;
+            }
+            return stream;
+          });
+          this.setState({ streams: newStreams });
+        });
+
+        this.setState({ ready: true });
+      });
     });
 
-    this.sessionHelper.session.on("streamPropertyChanged", (event) => {
-      console.log("CAMBIATO");
-      console.log(this.state.streams);
-      const newStreams = this.state.streams.map((stream) => {
-        if (stream.id === event.stream.id) {
-          // return { ...stream, hasAudio: event.newValue };
-          return event.stream;
-        }
-        return stream;
-      });
-      this.setState({ streams: newStreams });
-    });
+    // this.sessionHelper = createSession({
+    //   apiKey: config.apiKey,
+    //   sessionId: config.sessionId,
+    //   token: config.token,
+    //   onStreamsUpdated: (streams) => {
+    //     this.setState({ streams });
+    //   },
+    // });
+
+    // this.sessionHelper.session.on("streamPropertyChanged", (event) => {
+    //   const newStreams = this.state.streams.map((stream) => {
+    //     if (stream.id === event.stream.id) {
+    //       // return { ...stream, hasAudio: event.newValue };
+    //       return event.stream;
+    //     }
+    //     return stream;
+    //   });
+    //   this.setState({ streams: newStreams });
+    // });
+
+    // this.setState({ ready: true });
   }
 
   componentWillUnmount() {
@@ -126,6 +125,7 @@ class OpenTok extends React.Component {
   }
 
   render() {
+    if (!this.state.ready) return null;
     return (
       <div className="OpenTok">
         <Publisher session={this.sessionHelper.session} name="Daniele Suppo" />
