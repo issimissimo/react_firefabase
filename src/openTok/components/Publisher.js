@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { OTPublisher } from "opentok-react";
 import OTOverlay from "./overlay/OTOverlay";
-import "./VideoContainer.css";
+import "../OpenTok.css";
 
 export default class Publisher extends Component {
   constructor(props) {
@@ -40,7 +40,7 @@ export default class Publisher extends Component {
 
   render() {
     return (
-      <div className="VideoContainer">
+      <div className="OpenTok-video">
         <OTOverlay
           type="Publisher"
           name={this.props.name}

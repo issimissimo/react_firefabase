@@ -48,13 +48,15 @@ class OpenTok extends React.Component {
   }
 
   render() {
-    if (!this.state.ready) return null;
+    // if (!this.state.ready) return null;
     return (
       <div className="OpenTok">
-        <Publisher
-          session={this.sessionHelper.session}
-          name={this.props.name}
-        />
+        {this.state.ready && (
+          <Publisher
+            session={this.sessionHelper.session}
+            name={this.props.name}
+          />
+        )}
 
         {this.state.streams.map((stream) => {
           return (

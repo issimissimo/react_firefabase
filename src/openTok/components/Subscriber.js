@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { OTSubscriber } from "opentok-react";
 import OTOverlay from "./overlay/OTOverlay";
-import "./VideoContainer.css";
+import "../OpenTok.css";
 
 export default class Subscriber extends Component {
   constructor(props) {
@@ -18,11 +18,11 @@ export default class Subscriber extends Component {
 
   render() {
     return (
-      <div className="VideoContainer">
+      <div className="OpenTok-video">
         {/* {this.state.error ? <div>{this.state.error}</div> : null} */}
         <OTOverlay
           type="Subscriber"
-          name="Subscriber"
+          name={this.props.stream.name}
           audio={this.props.stream.hasAudio}
         />
         <OTSubscriber

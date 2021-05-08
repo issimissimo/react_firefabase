@@ -1,9 +1,23 @@
+:root {
+  --containerHeight: 15vh;
+}
+
 .OpenTok {
   width: 100%;
-  height: 200px;
+  height: var(--containerHeight);
   background-color: lightgray;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: auto;
+}
+
+.OpenTok-video {
+  position: relative;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 8px;
+  height: 90%;
+  width: calc(var(--containerHeight) * 1.33);
+  display: block !important;
 }
