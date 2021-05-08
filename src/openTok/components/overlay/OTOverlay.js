@@ -11,7 +11,7 @@ import "./OTOverlay.css";
 const AudioOff = () => {
   return (
     <div className="AudioOff">
-      <MicOffIcon color="error" />
+      <MicOffIcon htmlColor="#00ff40" />
     </div>
   );
 };
@@ -20,15 +20,10 @@ const AudioOff = () => {
 /// toggle button
 ///
 const ToggleBttn = ({ icons, enabled, onClicked }) => {
-  if (enabled)
-    return (
-      <div className="ToggleBttn" onClick={onClicked}>
-        {icons[0]}
-      </div>
-    );
+  const icon = enabled ? icons[0] : icons[1];
   return (
     <div className="ToggleBttn" onClick={onClicked}>
-      {icons[1]}
+      {icon}
     </div>
   );
 };

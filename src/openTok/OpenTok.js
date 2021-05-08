@@ -4,7 +4,7 @@ import { config } from "./config";
 import ConnectionStatus from "./components/ConnectionStatus";
 import Publisher from "./components/Publisher";
 import Subscriber from "./components/Subscriber";
-import './OpenTok.css'
+import "./OpenTok.css";
 
 class OpenTok extends React.Component {
   constructor(props) {
@@ -42,9 +42,11 @@ class OpenTok extends React.Component {
           {/* {this.state.error ? <div>{this.state.error}</div> : null}
           <ConnectionStatus connected={this.state.connected} /> */}
           <Publisher />
-          <OTStreams>
-            <Subscriber />
-          </OTStreams>
+          <div className="Streams">
+            <OTStreams>
+              <Subscriber />
+            </OTStreams>
+          </div>
         </OTSession>
       </div>
     );

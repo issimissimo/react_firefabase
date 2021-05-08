@@ -2,6 +2,10 @@
   width: 200px;
   height: 130px;
   position: relative;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 8px;
+  display: block !important;
 }
 
 
