@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-
-// import { OTSubscriber } from '../../src'
 import { OTSubscriber } from 'opentok-react';
-import CheckBox from './CheckBox';
+import OTOverlay from "./overlay/OTOverlay";
+import "./VideoContainer.css";
+
 
 export default class Subscriber extends Component {
   constructor(props) {
@@ -13,15 +13,34 @@ export default class Subscriber extends Component {
       audio: true,
       video: true
     };
+
+    this.subscriberEventHandlers = {
+      streamCreated: (event) => {
+        console.log("subscriber stream created");
+        console.log(event.stream.id);
+        // this.streamId = event.stream.id;
+      },
+    };
   }
 
-  setAudio = (audio) => {
-    this.setState({ audio });
+  componentDidMount(){
+    console.log("***************************")
+    console.log("DID MOUNT SUBSCRIBER!")
+    console.log(this.props)
+    console.log("***************************")
   }
 
-  setVideo = (video) => {
-    this.setState({ video });
+  componentDidUpdate(){
+    console.log("DID UPDATE SUBSCRIBER!")
   }
+
+  // setAudio = (audio) => {
+  //   this.setState({ audio });
+  // }
+
+  // setVideo = (video) => {
+  //   this.setState({ video });
+  // }
 
   onError = (err) => {
     this.setState({ error: `Failed to subscribe: ${err.message}` });
@@ -31,31 +50,27 @@ export default class Subscriber extends Component {
     return (
       <div className="VideoContainer">
         {/* {this.state.error ? <div>{this.state.error}</div> : null} */}
+        <OTOverlay
+          type="Subsciber"
+          name="Subscriber"
+          audio={this.state.audio}
+        />
         <OTSubscriber
           properties={{
-            subscribeToAudio: this.state.audio,
-            subscribeToVideo: this.state.video,
+            // subscribeToAudio: this.state.audio,
+            // subscribeToVideo: this.state.video,
             showControls: false,
             width: "100%",
             height: "100%",
             resolution: "320x240",
             frameRate: 15,
           }}
+          eventHandlers={this.subscriberEventHandlers}
           onError={this.onError}
           retry={true}
           maxRetryAttempts={3}
           retryAttemptTimeout={2000}
         />
-        {/* <CheckBox
-          label="Subscribe to Audio"
-          initialChecked={this.state.audio}
-          onChange={this.setAudio}
-        />
-        <CheckBox
-          label="Subscribe to Video"
-          initialChecked={this.state.video}
-          onChange={this.setVideo}
-        /> */}
       </div>
     );
   }

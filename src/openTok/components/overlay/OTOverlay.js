@@ -58,10 +58,12 @@ const OTOverlay = (props) => {
   return (
     <div className="OTOverlay">
       {!props.audio && <AudioOff />}
-      <div className="OTOverlay-Buttons">
+      {props.type === "Publisher" && (
+        <div className="OTOverlay-Buttons">
         {audioToggleBttn}
         {videoToggleBttn}
       </div>
+      )}
       <div className="OTOverlay-Name">
         <p>{props.name}</p>
       </div>

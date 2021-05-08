@@ -23,22 +23,31 @@ export default class Publisher extends Component {
       },
       videoElementCreated: (event) => {
         console.log("video element created");
-        console.log(event.element);
+      },
+      streamCreated: (event) => {
+        console.log("publisher stream created");
+        console.log(event.stream.id);
+        this.streamId = event.stream.id;
       },
     };
+
+    this.streamId = "";
 
     this.toggleAudio = this.toggleAudio.bind(this);
     this.toggleVideo = this.toggleVideo.bind(this);
   }
 
   toggleAudio = () => {
-    console.log("toggle audio")
     this.setState({ audio: !this.state.audio });
   };
 
   toggleVideo = () => {
     this.setState({ video: !this.state.video });
   };
+
+  componentDidUpdate(){
+    console.log("DID UPDATE PUBLISHER!")
+  }
 
   // setVideoSource = (videoSource) => {
   //   this.setState({ videoSource });
@@ -53,7 +62,8 @@ export default class Publisher extends Component {
     return (
       <div className="VideoContainer">
         <OTOverlay
-          name="Daniele Suppo"
+          type="Publisher"
+          name={this.props.name}
           audio={this.state.audio}
           video={this.state.video}
           toggleAudio={this.toggleAudio}
@@ -70,6 +80,8 @@ export default class Publisher extends Component {
             height: "100%",
             resolution: "320x240",
             frameRate: 15,
+            name: this.props.name,
+            id: "kjkdjkjkdhj",
           }}
           eventHandlers={this.publisherEventHandlers}
           onError={this.onError}
