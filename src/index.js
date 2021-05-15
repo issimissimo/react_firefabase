@@ -15,7 +15,7 @@ import OpenTok from "./openTok/OpenTok";
 import IPcam from "./loaders/IPcam/IPcam";
 
 
-import UploaderPanel from "./firebase/db/upload/UploaderPanel"
+import DbManager from "./firebase/db/DbManager"
 
 /////////////////////////////////////////////////////////////////
 ///////// SOLO DI TEST PER BYPASSARE L'AUTH INIZIALE ////////////
@@ -52,7 +52,7 @@ firebase
       <div>
         {/* <OpenTok name="Daniele Suppo" adminUid="eGy5XoYOFHfUtA2rLVWzQSPSjGe2" />
         <IPcam /> */}
-        <UploaderPanel userUid={userUid}/>
+        <DbManager userUid={userUid}/>
       </div>,
 
       document.getElementById("ReactRoot")

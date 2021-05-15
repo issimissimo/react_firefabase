@@ -39,14 +39,6 @@ function InputFilesButton(props) {
 function UploaderPanel(props) {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const storageRef = useRef();
-  const dbRef = useRef();
-
-  useEffect(() => {
-    /// set firebase storage and database reference
-    storageRef.current = firebase.storage().ref(props.userUid + "/assets/");
-    dbRef.current = firebase.database().ref(props.userUid + "/assets/");
-  }, []);
 
   const handlePickedFiles = (inputFiles) => {
     setFiles(inputFiles);
@@ -73,8 +65,8 @@ function UploaderPanel(props) {
             key={file.name}
             file={file}
             uploading={uploading}
-            storageRef={storageRef.current}
-            dbRef={dbRef.current}
+            storageRef={props.storageRef}
+            dbRef={props.dbRef}
           />
         ))}
       </div>

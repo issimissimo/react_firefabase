@@ -18,7 +18,7 @@ function FileUploadContainer(props) {
   const task = useRef();
 
   ///
-  /// upload the file to DB
+  /// upload the file
   ///
   const uploadFile = () => {
     console.log("uploading " + props.file.name + " ...");
@@ -39,7 +39,7 @@ function FileUploadContainer(props) {
       },
 
       function complete() {
-        /// save reference to database
+        /// ...and save a reference in database!
         const shortName = removeExtension(props.file.name);
         task.current.snapshot.ref.getDownloadURL().then((fileUrl) => {
           props.dbRef.child(shortName).set({
@@ -51,9 +51,7 @@ function FileUploadContainer(props) {
             // shared: false,
           });
           console.log("file added successfully");
-          console.log(fileUrl);
         });
-        console.log("complete");
       }
     );
   };
