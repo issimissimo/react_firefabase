@@ -39,20 +39,34 @@ function InputFilesButton(props) {
 function UploaderPanel(props) {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [filesInUpload, setFilesinUpload] = useState(0);
+  const filesToBeUploaded = useRef();
 
   const handlePickedFiles = (inputFiles) => {
     setFiles(inputFiles);
+    setFilesinUpload(inputFiles.length);
+    filesToBeUploaded.current = inputFiles.length;
   };
 
   const uploadAllFiles = () => {
     setUploading(true);
   };
 
+  const onFileUploaded = () => {
+    /// disable uploading as default
+    setUploading(false);
+    /// set the number of uploading files
+    filesToBeUploaded.current -= 1;
+    setFilesinUpload(filesToBeUploaded.current);
+    console.log("uploading pending files: " + filesToBeUploaded.current);
+  };
+
   return (
     <div className="UploaderPanel">
+      {console.log({ filesInUpload })}
       <div style={{ display: "flex" }}>
         <InputFilesButton handlePickedFiles={handlePickedFiles} />
-        {files.length > 0 && (
+        {filesInUpload > 0 && (
           <Button variant="contained" color="primary" onClick={uploadAllFiles}>
             UPLOAD ALL
           </Button>
@@ -67,6 +81,7 @@ function UploaderPanel(props) {
             uploading={uploading}
             storageRef={props.storageRef}
             dbRef={props.dbRef}
+            onFileUploaded={onFileUploaded}
           />
         ))}
       </div>

@@ -18,7 +18,7 @@ function FileListPanel(props) {
 
   useEffect(() => {
     props.dbRef.on("value", (snapshot) => {
-      console.log(snapshotToArray(snapshot));
+      // console.log(snapshotToArray(snapshot));
       setFiles(snapshotToArray(snapshot));
 
       // console.log(snapshot.val());

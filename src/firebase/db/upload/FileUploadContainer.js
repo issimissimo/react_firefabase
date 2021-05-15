@@ -5,12 +5,10 @@ import "firebase/storage";
 import ProgressBar from "./ProgressBar";
 import "./FileUploadContainer.css";
 
-
-const removeExtension = (string)=> {
+const removeExtension = (string) => {
   const st = string.replace(/\.[^/.]+$/, "");
   return st;
-}
-
+};
 
 function FileUploadContainer(props) {
   const [uploading, setUploading] = useState(props.uploading);
@@ -51,6 +49,7 @@ function FileUploadContainer(props) {
             // shared: false,
           });
           console.log("file added successfully");
+          props.onFileUploaded();
         });
       }
     );
