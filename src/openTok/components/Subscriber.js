@@ -18,7 +18,7 @@ export default class Subscriber extends Component {
 
   render() {
     return (
-      <div className="OpenTok-video">
+      <div className={`OpenTok-video OpenTok-video-subscriber`}>
         {/* {this.state.error ? <div>{this.state.error}</div> : null} */}
         <OTOverlay
           type="Subscriber"

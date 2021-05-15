@@ -43,9 +43,9 @@
 
 .AudioOff {
   position: absolute;
-  top: 0;
-  right: 0;
-  margin: 5px;
+  top: 20%;
+  right: 20%;
+  margin: 0;
 }
 
 .ToggleBttn {

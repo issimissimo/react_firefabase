@@ -11,7 +11,6 @@ export default class Publisher extends Component {
       error: null,
       audio: true,
       video: true,
-      videoSource: "camera",
     };
 
     this.publisherEventHandlers = {
@@ -40,7 +39,7 @@ export default class Publisher extends Component {
 
   render() {
     return (
-      <div className="OpenTok-video">
+      <div className={`OpenTok-video OpenTok-video-publisher`}>
         <OTOverlay
           type="Publisher"
           name={this.props.name}

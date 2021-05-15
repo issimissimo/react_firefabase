@@ -12,10 +12,10 @@ import ReactDOM from "react-dom";
 import App from "./firebase/firebase";
 
 import OpenTok from "./openTok/OpenTok";
+import IPcam from "./loaders/IPcam/IPcam";
 
 
-
-
+import UploaderPanel from "./firebase/db/upload/UploaderPanel"
 
 /////////////////////////////////////////////////////////////////
 ///////// SOLO DI TEST PER BYPASSARE L'AUTH INIZIALE ////////////
@@ -38,15 +38,23 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
+const email = "a@a.com";
+const password = "123456"
+const userUid = "PHG8MkCjc9eL0NFhaavu8GNp5Yl2"
+
 firebase
   .auth()
-  .signInWithEmailAndPassword("a@a.com", "123456")
+  .signInWithEmailAndPassword(email, password)
   .then((result) => {
-
-
     ReactDOM.render(
       // <App roomIdToJoin={roomIdToJoin}/>,
-      <OpenTok name="Daniele Suppo" adminUid="eGy5XoYOFHfUtA2rLVWzQSPSjGe2"/>,
+
+      <div>
+        {/* <OpenTok name="Daniele Suppo" adminUid="eGy5XoYOFHfUtA2rLVWzQSPSjGe2" />
+        <IPcam /> */}
+        <UploaderPanel userUid={userUid}/>
+      </div>,
+
       document.getElementById("ReactRoot")
     );
   });
@@ -55,15 +63,11 @@ firebase
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 
-
-let roomIdToJoin = null;
-roomIdToJoin = "-M_53BX7Ob5wtzk3CN5J";
-
+// let roomIdToJoin = null;
+// roomIdToJoin = "-M_53BX7Ob5wtzk3CN5J";
 
 // ReactDOM.render(
 //   // <App roomIdToJoin={roomIdToJoin}/>,
-//   <OpenTok name="Daniele Suppo" adminUid="eGy5XoYOFHfUtA2rLVWzQSPSjGe2"/>,
+//   <UploaderPanel/>,
 //   document.getElementById("ReactRoot")
 // );
-
-
