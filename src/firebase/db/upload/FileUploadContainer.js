@@ -11,16 +11,22 @@ const removeExtension = (string) => {
 };
 
 function FileUploadContainer(props) {
+  const [path, setPath] = useState("");
   const [uploading, setUploading] = useState(props.uploading);
   const [progressValue, setProgressValue] = useState(0);
   const task = useRef();
+
+
+  const handleChangePath = (event) => {
+    setPath(event.target.value)
+  }
 
   ///
   /// upload the file
   ///
   const uploadFile = () => {
     console.log("uploading " + props.file.name + " ...");
-    const fileRef = props.storageRef.child(props.file.name);
+    const fileRef = props.storageRef.child(path + props.file.name);
     task.current = fileRef.put(props.file);
 
     task.current.on(
@@ -40,7 +46,7 @@ function FileUploadContainer(props) {
         /// ...and save a reference in database!
         const shortName = removeExtension(props.file.name);
         task.current.snapshot.ref.getDownloadURL().then((fileUrl) => {
-          props.dbRef.child(shortName).set({
+          props.dbRef.child(path + shortName).set({
             // type: self.fileType,
             // fullName: self.file.name,
             name: props.file.name,
@@ -66,6 +72,11 @@ function FileUploadContainer(props) {
   return (
     <div className="FileUploadContainer">
       <p>{props.file.name}</p>
+      <input
+        type="text"
+        value={path}
+        onChange={handleChangePath}
+      ></input>
       <ProgressBar progress={progressValue} fillColor="blue" />
     </div>
   );

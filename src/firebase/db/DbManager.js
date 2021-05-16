@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import firebase from "firebase/app";
 import "firebase/database";
 import "firebase/storage";
-import FileListPanel from "./upload/FileListPanel";
+import FileManager from "./upload/FileManager/FileManager";
 import UploaderPanel from "./upload/UploaderPanel";
 
 function DbManager(props) {
@@ -12,7 +12,7 @@ function DbManager(props) {
   return (
     <div>
       <UploaderPanel storageRef={storageRef} dbRef={dbRef} />
-      <FileListPanel storageRef={storageRef} dbRef={dbRef} />
+      <FileManager storageRef={storageRef} dbRef={dbRef} />
     </div>
   );
 }

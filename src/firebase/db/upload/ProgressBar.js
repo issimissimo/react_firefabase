@@ -3,10 +3,10 @@ import React from "react";
 const ProgressBar = ({progress, fillColor}) => {
 
   const containerStyles = {
-    height: 15,
+    height: 5,
     width: '100%',
     backgroundColor: "#e0e0de",
-    borderRadius: 50,
+    borderRadius: 4,
     margin: 50
   }
 
@@ -29,7 +29,7 @@ const ProgressBar = ({progress, fillColor}) => {
   return (
     <div style={containerStyles}>
       <div style={fillerStyles}>
-        <span style={labelStyles}>{progress}%</span>
+        {/* <span style={labelStyles}>{progress}%</span> */}
       </div>
     </div>
   );

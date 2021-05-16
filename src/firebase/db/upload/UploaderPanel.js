@@ -3,7 +3,9 @@ import firebase from "firebase/app";
 import "firebase/database";
 import "firebase/storage";
 import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import FileUploadContainer from "./FileUploadContainer";
+import SpinnerButton from "./SpinnerButton"
 
 function InputFilesButton(props) {
   const inputRef = useRef(null);
@@ -32,6 +34,33 @@ function InputFilesButton(props) {
   );
 }
 
+// function SpinnerButton(props) {
+//   const [state, setState] = useState("button");
+
+//   const setSpinner = () => {
+//     console.log("set");
+//   };
+
+
+//   let item;
+//   if (state === "button") {
+//     item = (
+//       <Button
+//         variant="contained"
+//         color="primary"
+//         onClick={() => {
+//           // props.onClick();
+//           setState("spinner");
+//         }}
+//       >
+//         {props.label}
+//       </Button>
+//     );
+//   } else if (state === "spinner") item = <CircularProgress />;
+
+//   return <div>{item}</div>;
+// }
+
 //////////////////////////
 ///////////////////////////
 ///////////////////////////
@@ -40,6 +69,11 @@ function UploaderPanel(props) {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [filesInUpload, setFilesinUpload] = useState(0);
+
+  /// è assurdo ma devo fare un'altra variabile per tenere traccia
+  /// dei files uploadati, per po mandarla a "filesInUpload"...!!!!
+  /// Questo perchè quando si aggiorna lo stato impiega un tempo indefinito
+  /// prima di aggiornarsi... follia...
   const filesToBeUploaded = useRef();
 
   const handlePickedFiles = (inputFiles) => {
@@ -67,9 +101,7 @@ function UploaderPanel(props) {
       <div style={{ display: "flex" }}>
         <InputFilesButton handlePickedFiles={handlePickedFiles} />
         {filesInUpload > 0 && (
-          <Button variant="contained" color="primary" onClick={uploadAllFiles}>
-            UPLOAD ALL
-          </Button>
+          <SpinnerButton label="UPLOAD ALL" onClick={uploadAllFiles} />
         )}
       </div>
 
