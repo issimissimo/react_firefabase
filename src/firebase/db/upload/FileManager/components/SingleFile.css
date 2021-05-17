@@ -7,14 +7,13 @@
   cursor: default;
   height: 100px;
   width: 100px;
-
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 }
 
 .SingleFile:hover {
-  background-color: aqua;
+  background-color: rgb(114, 114, 114);
+}
+
+.SingleFile-text {
+    font-size: small;
+    font-weight: 500;
 }

@@ -6,21 +6,6 @@ import SingleFile from "./components/SingleFile";
 import NavBar from "./components/NavBar";
 import "./FileManager.css";
 
-/// Convert an object with files and folders
-/// to array
-const objToArray = (object) => {
-  const array = [];
-  for (const [key, value] of Object.entries(object)) {
-    var newObj = {
-      key: value.hasOwnProperty("name") ? value.name : key,
-      isFolder: value.hasOwnProperty("name") ? false : true,
-      value: value,
-    };
-    array.push(newObj);
-  }
-  return array;
-};
-
 const testObject = {
   primofile: {
     name: "file1.jpg",
@@ -60,7 +45,9 @@ const testObject = {
 function FileManager(props) {
   const [files, setFiles] = useState([]);
   const [foldersOpen, setFoldersOpen] = useState([]);
+  const fullPath = useRef();
 
+  /// on mounting
   useEffect(() => {
     // props.dbRef.on("value", (snapshot) => {
     //   const rootObj = {
@@ -79,32 +66,48 @@ function FileManager(props) {
     openFolder(rootObj);
   }, []);
 
+  /// Convert an object with files and folders
+  /// to array
+  const objToArray = (object) => {
+    const array = [];
+    for (const [key, value] of Object.entries(object)) {
+      var newObj = {
+        // key: value.hasOwnProperty("name") ? value.name : key,
+        key: key,
+        isFolder: value.hasOwnProperty("name") ? false : true,
+        value: value,
+      };
+      array.push(newObj);
+    }
+    return array;
+  };
+
   const handleDoubleClickOnItem = (item) => {
     if (item.isFolder) {
       openFolder(item);
     } else {
-      console.log("devo aprire il file...");
+      console.log("devo aprire il file: " + item.key);
     }
   };
 
-  /// open folder with click on it
   const openFolder = (folder, index = null) => {
     refresh(folder.value);
 
+    /// set foldersOpen
     const newFoldersOpen =
       index === null
         ? [...foldersOpen, folder]
         : foldersOpen.slice(0, index + 1);
     setFoldersOpen(newFoldersOpen);
+
+    /// set fullPath
+    fullPath.current = newFoldersOpen.map((folder) => {
+      return folder.key;
+    });
+    console.log(fullPath.current);
   };
 
-  // /// go back to folders from navbar
-  // const navigateBackToFolder = (folder, index) => {
-  //   refresh(folder.value);
-  //   const newFoldersOpen = foldersOpen.slice(0, index + 1);
-  //   setFoldersOpen(newFoldersOpen);
-  // };
-
+  /// refresh files
   const refresh = (inputObj) => {
     setFiles(objToArray(inputObj));
   };

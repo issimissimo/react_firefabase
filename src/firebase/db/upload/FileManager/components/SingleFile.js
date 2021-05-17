@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import FolderIcon from "@material-ui/icons/Folder";
-import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
+import FolderOpenOutlinedIcon from "@material-ui/icons/FolderOpenOutlined";
+import InsertDriveFileOutlinedIcon from "@material-ui/icons/InsertDriveFileOutlined";
 import "./SingleFile.css";
 
 function SingleFile(props) {
@@ -9,15 +9,15 @@ function SingleFile(props) {
   };
 
   const icon = props.item.isFolder ? (
-    <FolderIcon style={{ fontSize: 60 }} />
+    <FolderOpenOutlinedIcon style={{ fontSize: 70 }} />
   ) : (
-    <InsertDriveFileIcon />
+    <InsertDriveFileOutlinedIcon style={{ fontSize: 40 }} />
   );
 
   return (
     <div className="SingleFile" onDoubleClick={handleDoubleClick}>
       {icon}
-      <span>{props.item.key}</span>
+      <span className="SingleFile-text">{props.item.key}</span>
     </div>
   );
 }
