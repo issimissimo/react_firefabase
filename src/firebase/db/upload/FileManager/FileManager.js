@@ -3,13 +3,13 @@ import firebase from "firebase/app";
 import "firebase/database";
 import "firebase/storage";
 import SingleFile from "./components/SingleFile";
+import NavBar from "./components/NavBar";
 import "./FileManager.css";
 
 /// Convert an object with files and folders
 /// to array
-function objToArray(object) {
+const objToArray = (object) => {
   const array = [];
-  /// iterate for each property of the object
   for (const [key, value] of Object.entries(object)) {
     var newObj = {
       key: value.hasOwnProperty("name") ? value.name : key,
@@ -19,38 +19,7 @@ function objToArray(object) {
     array.push(newObj);
   }
   return array;
-}
-
-// function snapshotToArray(snapshot) {
-//   var returnArr = [];
-//   snapshot.forEach((childSnapshot) => {
-//     var item = childSnapshot.val();
-//     // console.log(item);
-
-//     /// create children from subObjects (folder)
-//     for (var property in item) {
-//       if (typeof item[property] == "object") {
-//         if (!item.hasOwnProperty("children")) item.children = [];
-//         // console.log(property)
-//         // console.log(item[property])
-//         item.children.push(item[property]);
-//       }
-//     }
-
-//     item.isFolder = item.hasOwnProperty("name") ? false : true;
-
-//     item.key = item.hasOwnProperty("name") ? item.name : childSnapshot.key;
-
-//     item.icon = item.hasOwnProperty("name") ? (
-//       <InsertDriveFileIcon />
-//     ) : (
-//       <FolderIcon style={{ fontSize: 60 }} />
-//     );
-
-//     returnArr.push(item);
-//   });
-//   return returnArr;
-// }
+};
 
 const testObject = {
   primofile: {
@@ -90,31 +59,68 @@ const testObject = {
 
 function FileManager(props) {
   const [files, setFiles] = useState([]);
+  const [foldersOpen, setFoldersOpen] = useState([]);
 
   useEffect(() => {
-    setFiles(objToArray(testObject));
-
     // props.dbRef.on("value", (snapshot) => {
-    //   setFiles(objToArray(snapshot.val()));
+    //   const rootObj = {
+    //     key: "root",
+    //     isFolder: true,
+    //     value: snapshot.val(),
+    //   };
+    //   openFolder(rootObj);
     // });
+
+    const rootObj = {
+      key: "root",
+      isFolder: true,
+      value: testObject,
+    };
+    openFolder(rootObj);
   }, []);
 
   const handleDoubleClickOnItem = (item) => {
-    // console.log(item.isFolder);
-    // console.log(item.value);
     if (item.isFolder) {
-      setFiles(objToArray(item.value));
-    }
-    else{
-      console.log("devo aprire il file...")
+      openFolder(item);
+    } else {
+      console.log("devo aprire il file...");
     }
   };
 
+  /// open folder with click on it
+  const openFolder = (folder, index = null) => {
+    refresh(folder.value);
+
+    const newFoldersOpen =
+      index === null
+        ? [...foldersOpen, folder]
+        : foldersOpen.slice(0, index + 1);
+    setFoldersOpen(newFoldersOpen);
+  };
+
+  // /// go back to folders from navbar
+  // const navigateBackToFolder = (folder, index) => {
+  //   refresh(folder.value);
+  //   const newFoldersOpen = foldersOpen.slice(0, index + 1);
+  //   setFoldersOpen(newFoldersOpen);
+  // };
+
+  const refresh = (inputObj) => {
+    setFiles(objToArray(inputObj));
+  };
+
   return (
-    <div className="FileManager">
-      {files.map((item) => (
-        <SingleFile key={item.key} item={item} onDoubleClick={handleDoubleClickOnItem} />
-      ))}
+    <div>
+      <NavBar folders={foldersOpen} onNavigateToFolder={openFolder} />
+      <div className="FileManager">
+        {files.map((item) => (
+          <SingleFile
+            key={item.key}
+            item={item}
+            onDoubleClick={handleDoubleClickOnItem}
+          />
+        ))}
+      </div>
     </div>
   );
 }
