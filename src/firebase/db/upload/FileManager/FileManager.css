@@ -1,4 +1,5 @@
 .FileManager{
-    display: grid;
-    grid-template-columns: auto auto auto auto;
+    display: flex;
+    /* grid-template-columns: 25% 25% 25% 25%; */
+    flex-wrap: wrap;
 }
