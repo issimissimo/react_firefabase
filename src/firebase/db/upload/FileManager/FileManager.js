@@ -67,8 +67,15 @@ function FileManager(props) {
     //   value: objToArray(testObject),
     // };
     // openFolder(rootObj);
-
   }, []);
+
+  useEffect(() => {
+    console.log(selected.length);
+  });
+
+  ////////////////////////////////////////////////////////////////////////
+  //////////////////// TO BE CONVERTED TO API .../////////////////////////
+  ////////////////////////////////////////////////////////////////////////
 
   /// Convert an object with files and folders
   /// to array
@@ -95,13 +102,52 @@ function FileManager(props) {
     return array;
   };
 
-  const handleClickOnItem = (item) => {
-    item.isSelected = !item.isSelected;
-    item.isSelected
-      ? setSelected([...selected, item])
-      : setSelected(selected.filter((_item) => _item !== item));
+  /// select all files inside a folder (also nested)
+  const getAllFilesInFolder = (folder) => {
+    const array = [];
+    const iterate = (_array) => {
+      _array.forEach((el) => {
+        if (el.isFolder) iterate(el.value);
+        else array.push(el);
+      });
+    };
+    iterate(folder);
+    return array;
   };
 
+  ////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////
+
+  ///
+  /// select items on click
+  ///
+  const handleClickOnItem = (item) => {
+    item.isSelected = !item.isSelected;
+
+    /// if is it a folder select all files inside
+    if (item.isFolder) {
+      const filesInFolder = getAllFilesInFolder(item.value);
+
+      if (item.isSelected) {
+        setSelected([...selected, ...filesInFolder]);
+        filesInFolder.forEach((el) => (el.isSelected = true));
+      } else {
+        setSelected(selected.filter((_item) => !filesInFolder.includes(_item)));
+        filesInFolder.forEach((el) => (el.isSelected = false));
+      }
+    }
+    /// just a single file
+    else {
+      item.isSelected
+        ? setSelected([...selected, item])
+        : setSelected(selected.filter((_item) => _item !== item));
+    }
+  };
+
+  ///
+  /// open item on doubleclick (file or folder)
+  ///
   const handleDoubleClickOnItem = (item) => {
     if (item.isFolder) {
       openFolder(item);
@@ -117,6 +163,9 @@ function FileManager(props) {
     }
   };
 
+  ///
+  /// open folder
+  ///
   const openFolder = (folder, index = null) => {
     setFiles(folder.value);
 
@@ -146,7 +195,8 @@ function FileManager(props) {
 
   return (
     <div>
-      <Button onClick={deleteSelected}>DELETE</Button>
+      {selected.length > 0 && <Button onClick={deleteSelected}>DELETE</Button>}
+
       <NavBar folders={foldersOpen} onNavigateToFolder={openFolder} />
       <div className="FileManager">
         {files.map((item) => (
