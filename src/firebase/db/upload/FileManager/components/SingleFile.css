@@ -17,3 +17,11 @@
     font-size: small;
     font-weight: 500;
 }
+
+.SingleFile-selected {
+    background-color: rgb(177, 177, 177) !important;
+}
+
+.SingleFile-clicked {
+    background-color: cornflowerblue !important;
+}

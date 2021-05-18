@@ -42,9 +42,13 @@ const testObject = {
   },
 };
 
+
+
 function FileManager(props) {
   const [files, setFiles] = useState([]);
   const [foldersOpen, setFoldersOpen] = useState([]);
+  const [clicked, setClicked] = useState({});
+  const [selected, setSelected] = useState([]);
   const fullPath = useRef();
 
   /// on mounting
@@ -61,7 +65,7 @@ function FileManager(props) {
     const rootObj = {
       key: "root",
       isFolder: true,
-      value: testObject,
+      value: objToArray(testObject),
     };
     openFolder(rootObj);
   }, []);
@@ -71,12 +75,19 @@ function FileManager(props) {
   const objToArray = (object) => {
     const array = [];
     for (const [key, value] of Object.entries(object)) {
-      var newObj = {
-        // key: value.hasOwnProperty("name") ? value.name : key,
+      const newObj = {
         key: key,
+        name: value.hasOwnProperty("name") ? value.name : key,
         isFolder: value.hasOwnProperty("name") ? false : true,
+        isSelected: key === selected.key ? true : false,
+        isClicked: key === clicked.key ? true : false,
         value: value,
       };
+
+      if (newObj.isFolder) {
+        newObj.value = objToArray(value);
+      }
+
       array.push(newObj);
     }
     return array;
@@ -86,7 +97,15 @@ function FileManager(props) {
     if (item.isFolder) {
       openFolder(item);
     } else {
-      console.log("devo aprire il file: " + item.key);
+      if (item !== clicked) {
+        console.log("devo aprire il file: " + item.key);
+        if (clicked) {
+          clicked.isClicked = false;
+          console.log(clicked);
+        }
+        item.isClicked = true;
+        setClicked(item);
+      }
     }
   };
 
@@ -109,7 +128,7 @@ function FileManager(props) {
 
   /// refresh files
   const refresh = (inputObj) => {
-    setFiles(objToArray(inputObj));
+    setFiles(inputObj);
   };
 
   return (

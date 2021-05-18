@@ -15,7 +15,12 @@ function SingleFile(props) {
   );
 
   return (
-    <div className="SingleFile" onDoubleClick={handleDoubleClick}>
+    <div
+      className={`${
+        props.item.isClicked ? "SingleFile-clicked" : ""
+      } SingleFile`}
+      onDoubleClick={handleDoubleClick}
+    >
       {icon}
       <span className="SingleFile-text">{props.item.key}</span>
     </div>
