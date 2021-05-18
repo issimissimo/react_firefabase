@@ -42,8 +42,6 @@ const testObject = {
   },
 };
 
-
-
 function FileManager(props) {
   const [files, setFiles] = useState([]);
   const [foldersOpen, setFoldersOpen] = useState([]);
@@ -63,7 +61,7 @@ function FileManager(props) {
     // });
 
     const rootObj = {
-      key: "root",
+      key: "Storage",
       isFolder: true,
       value: objToArray(testObject),
     };
@@ -79,7 +77,7 @@ function FileManager(props) {
         key: key,
         name: value.hasOwnProperty("name") ? value.name : key,
         isFolder: value.hasOwnProperty("name") ? false : true,
-        isSelected: key === selected.key ? true : false,
+        // isSelected: key === selected.key ? true : false,
         isClicked: key === clicked.key ? true : false,
         value: value,
       };
@@ -93,6 +91,13 @@ function FileManager(props) {
     return array;
   };
 
+  const handleClickOnItem = (item) => {
+    item.isSelected = !item.isSelected;
+    item.isSelected
+      ? setSelected([...selected, item])
+      : setSelected(selected.filter((_item) => _item !== item));
+  };
+
   const handleDoubleClickOnItem = (item) => {
     if (item.isFolder) {
       openFolder(item);
@@ -101,7 +106,6 @@ function FileManager(props) {
         console.log("devo aprire il file: " + item.key);
         if (clicked) {
           clicked.isClicked = false;
-          console.log(clicked);
         }
         item.isClicked = true;
         setClicked(item);
@@ -110,7 +114,7 @@ function FileManager(props) {
   };
 
   const openFolder = (folder, index = null) => {
-    refresh(folder.value);
+    setFiles(folder.value);
 
     /// set foldersOpen
     const newFoldersOpen =
@@ -126,19 +130,15 @@ function FileManager(props) {
     console.log(fullPath.current);
   };
 
-  /// refresh files
-  const refresh = (inputObj) => {
-    setFiles(inputObj);
-  };
-
   return (
     <div>
       <NavBar folders={foldersOpen} onNavigateToFolder={openFolder} />
       <div className="FileManager">
         {files.map((item) => (
           <SingleFile
-            key={item.key}
+            key={item.name}
             item={item}
+            onClick={handleClickOnItem}
             onDoubleClick={handleDoubleClickOnItem}
           />
         ))}

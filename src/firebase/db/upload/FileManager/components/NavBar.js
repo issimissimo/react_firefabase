@@ -3,11 +3,6 @@ import "./NavBar.css";
 import Box from "@material-ui/core/Box";
 
 function NavBar(props) {
-  // const handleClick = (folder) => {
-  //   console.log("click");
-  //   props.onNavigateToFolder(folder);
-  // };
-
   return (
     <div className="NavBar">
       {props.folders.map((folder, index) => (
