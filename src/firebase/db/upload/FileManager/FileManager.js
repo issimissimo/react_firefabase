@@ -49,6 +49,7 @@ function FileManager(props) {
   const [clicked, setClicked] = useState({});
   const [selected, setSelected] = useState([]);
   const fullPath = useRef();
+  const clickedRef = useRef();
 
   /// on mounting
   useEffect(() => {
@@ -70,8 +71,10 @@ function FileManager(props) {
   }, []);
 
   useEffect(() => {
-    console.log(selected.length);
-  });
+    console.log("***** SET CLICKED *****")
+    console.log(clicked);
+    console.log("----- end -------")
+  }, [clicked]);
 
   ////////////////////////////////////////////////////////////////////////
   //////////////////// TO BE CONVERTED TO API .../////////////////////////
@@ -80,16 +83,26 @@ function FileManager(props) {
   /// Convert an object with files and folders
   /// to array
   const objToArray = (object, path = "", folderName = "") => {
+
+    console.log(clickedRef.current)
+
     const array = [];
     for (const [key, value] of Object.entries(object)) {
       const slash = folderName ? "/" : "";
+      const name = value.hasOwnProperty("name") ? value.name : key;
+      const isClicked = false;
+      if (clickedRef.current){
+        if (name === clickedRef.current.name) isClicked = true;
+      }
+      console.log("<--- name: " + name)
       const newObj = {
         key: key,
-        name: value.hasOwnProperty("name") ? value.name : key,
+        name: name,
         path: path + folderName + slash,
+        visible: true,
         isFolder: value.hasOwnProperty("name") ? false : true,
-        // isSelected: key === selected.key ? true : false,
-        isClicked: key === clicked.key ? true : false,
+        // isSelected: name === selected.name ? true : false,
+        isClicked: isClicked,
         value: value,
       };
 
@@ -149,6 +162,9 @@ function FileManager(props) {
   /// open item on doubleclick (file or folder)
   ///
   const handleDoubleClickOnItem = (item) => {
+    
+    clickedRef.current = item;
+
     if (item.isFolder) {
       openFolder(item);
     } else {
