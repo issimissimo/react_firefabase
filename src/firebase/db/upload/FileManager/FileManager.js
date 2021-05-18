@@ -5,6 +5,7 @@ import "firebase/storage";
 import SingleFile from "./components/SingleFile";
 import NavBar from "./components/NavBar";
 import "./FileManager.css";
+import { Button } from "@material-ui/core";
 
 const testObject = {
   primofile: {
@@ -51,31 +52,34 @@ function FileManager(props) {
 
   /// on mounting
   useEffect(() => {
-    // props.dbRef.on("value", (snapshot) => {
-    //   const rootObj = {
-    //     key: "root",
-    //     isFolder: true,
-    //     value: snapshot.val(),
-    //   };
-    //   openFolder(rootObj);
-    // });
+    props.dbRef.on("value", (snapshot) => {
+      const rootObj = {
+        key: "root",
+        isFolder: true,
+        value: objToArray(snapshot.val()),
+      };
+      openFolder(rootObj);
+    });
 
-    const rootObj = {
-      key: "Storage",
-      isFolder: true,
-      value: objToArray(testObject),
-    };
-    openFolder(rootObj);
+    // const rootObj = {
+    //   key: "Storage",
+    //   isFolder: true,
+    //   value: objToArray(testObject),
+    // };
+    // openFolder(rootObj);
+
   }, []);
 
   /// Convert an object with files and folders
   /// to array
-  const objToArray = (object) => {
+  const objToArray = (object, path = "", folderName = "") => {
     const array = [];
     for (const [key, value] of Object.entries(object)) {
+      const slash = folderName ? "/" : "";
       const newObj = {
         key: key,
         name: value.hasOwnProperty("name") ? value.name : key,
+        path: path + folderName + slash,
         isFolder: value.hasOwnProperty("name") ? false : true,
         // isSelected: key === selected.key ? true : false,
         isClicked: key === clicked.key ? true : false,
@@ -83,7 +87,7 @@ function FileManager(props) {
       };
 
       if (newObj.isFolder) {
-        newObj.value = objToArray(value);
+        newObj.value = objToArray(value, newObj.path, key);
       }
 
       array.push(newObj);
@@ -130,8 +134,19 @@ function FileManager(props) {
     console.log(fullPath.current);
   };
 
+  const deleteSelected = () => {
+    selected.forEach((item) => {
+      console.log(item.path + item.key);
+      console.log(item.path + item.name);
+      props.dbRef.child(item.path + item.key).remove();
+      props.storageRef.child(item.path + item.name).delete();
+    });
+    setSelected([]);
+  };
+
   return (
     <div>
+      <Button onClick={deleteSelected}>DELETE</Button>
       <NavBar folders={foldersOpen} onNavigateToFolder={openFolder} />
       <div className="FileManager">
         {files.map((item) => (
