@@ -3,6 +3,7 @@ import firebase from "firebase/app";
 import "firebase/database";
 import "firebase/storage";
 import SingleFile from "./components/SingleFile";
+import ToolBar from "./components/ToolBar";
 import NavBar from "./components/NavBar";
 import "./FileManager.css";
 import { Button } from "@material-ui/core";
@@ -51,6 +52,10 @@ function FileManager(props) {
   const fullPath = useRef();
   const clickedRef = useRef();
 
+  useEffect(() => {
+    clickedRef.current = clicked;
+  }, [clicked]);
+
   /// on mounting
   useEffect(() => {
     props.dbRef.on("value", (snapshot) => {
@@ -59,7 +64,8 @@ function FileManager(props) {
         isFolder: true,
         value: objToArray(snapshot.val()),
       };
-      openFolder(rootObj);
+
+      openFolder(rootObj, null, null, clicked);
     });
 
     // const rootObj = {
@@ -70,12 +76,6 @@ function FileManager(props) {
     // openFolder(rootObj);
   }, []);
 
-  useEffect(() => {
-    console.log("***** SET CLICKED *****")
-    console.log(clicked);
-    console.log("----- end -------")
-  }, [clicked]);
-
   ////////////////////////////////////////////////////////////////////////
   //////////////////// TO BE CONVERTED TO API .../////////////////////////
   ////////////////////////////////////////////////////////////////////////
@@ -83,26 +83,18 @@ function FileManager(props) {
   /// Convert an object with files and folders
   /// to array
   const objToArray = (object, path = "", folderName = "") => {
-
-    console.log(clickedRef.current)
-
     const array = [];
     for (const [key, value] of Object.entries(object)) {
       const slash = folderName ? "/" : "";
       const name = value.hasOwnProperty("name") ? value.name : key;
-      const isClicked = false;
-      if (clickedRef.current){
-        if (name === clickedRef.current.name) isClicked = true;
-      }
-      console.log("<--- name: " + name)
       const newObj = {
         key: key,
         name: name,
         path: path + folderName + slash,
         visible: true,
         isFolder: value.hasOwnProperty("name") ? false : true,
-        // isSelected: name === selected.name ? true : false,
-        isClicked: isClicked,
+        isSelected: false,
+        isClicked: name === clickedRef.current.name ? true : false,
         value: value,
       };
 
@@ -162,8 +154,7 @@ function FileManager(props) {
   /// open item on doubleclick (file or folder)
   ///
   const handleDoubleClickOnItem = (item) => {
-    
-    clickedRef.current = item;
+    // clickedFile.current = item;
 
     if (item.isFolder) {
       openFolder(item);
@@ -196,13 +187,13 @@ function FileManager(props) {
     fullPath.current = newFoldersOpen.map((folder) => {
       return folder.key;
     });
-    console.log(fullPath.current);
   };
 
+  ///
+  /// delete selected files
+  ///
   const deleteSelected = () => {
     selected.forEach((item) => {
-      console.log(item.path + item.key);
-      console.log(item.path + item.name);
       props.dbRef.child(item.path + item.key).remove();
       props.storageRef.child(item.path + item.name).delete();
     });
@@ -211,8 +202,8 @@ function FileManager(props) {
 
   return (
     <div>
-      {selected.length > 0 && <Button onClick={deleteSelected}>DELETE</Button>}
-
+      {/* {selected.length > 0 && <Button onClick={deleteSelected}>DELETE</Button>} */}
+      <ToolBar selected={selected} onClickDelete={deleteSelected}/>
       <NavBar folders={foldersOpen} onNavigateToFolder={openFolder} />
       <div className="FileManager">
         {files.map((item) => (
