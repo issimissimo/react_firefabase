@@ -4,8 +4,12 @@ import { Button } from "@material-ui/core";
 
 function ToolBar(props) {
   const handleDeleteClick = () => {
-      props.onClickDelete();
+      props.onDelete();
   };
+
+  const handleDeleteFolder = () =>{
+      props.onCreateFolder();
+  }
 
   return (
     <div className="ToolBar">
@@ -13,7 +17,7 @@ function ToolBar(props) {
         variant="contained"
         color="primary"
         disableElevation
-        onClick={handleDeleteClick}
+        onClick={handleDeleteFolder}
       >
         Create Folder
       </Button>

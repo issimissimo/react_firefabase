@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import FolderOpenOutlinedIcon from "@material-ui/icons/FolderOpenOutlined";
 import InsertDriveFileOutlinedIcon from "@material-ui/icons/InsertDriveFileOutlined";
 import "./SingleFile.css";
@@ -25,18 +25,22 @@ function SingleFile(props) {
     <InsertDriveFileOutlinedIcon style={{ fontSize: 40 }} />
   );
 
-  return (
-    <div
-      className={`${props.item.isClicked ? "SingleFile-clicked" : ""} ${
-        props.item.isSelected ? "SingleFile-selected" : ""
-      } SingleFile`}
-      onClick={handleClick}
-      onDoubleClick={handleDoubleClick}
-    >
-      {icon}
-      <span className="SingleFile-text">{props.item.name}</span>
-    </div>
-  );
+  if (props.item.visible) {
+    return (
+      <div
+        className={`${props.item.isClicked ? "SingleFile-clicked" : ""} ${
+          props.item.isSelected ? "SingleFile-selected" : ""
+        } SingleFile`}
+        onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
+      >
+        {icon}
+        <span className="SingleFile-text">{props.item.name}</span>
+      </div>
+    );
+  } else {
+    return null;
+  }
 }
 
 export default SingleFile;

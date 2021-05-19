@@ -91,7 +91,7 @@ function FileManager(props) {
         key: key,
         name: name,
         path: path + folderName + slash,
-        visible: true,
+        visible: name === "index_tmp" ? false : true,
         isFolder: value.hasOwnProperty("name") ? false : true,
         isSelected: false,
         isClicked: name === clickedRef.current.name ? true : false,
@@ -195,15 +195,34 @@ function FileManager(props) {
   const deleteSelected = () => {
     selected.forEach((item) => {
       props.dbRef.child(item.path + item.key).remove();
-      props.storageRef.child(item.path + item.name).delete();
+      if (item.name !== "index_tmp")
+        props.storageRef.child(item.path + item.name).delete();
     });
     setSelected([]);
   };
 
+  ///
+  /// create folder
+  ///
+  const createFolder = (_folderName) => {
+    const folderName = "folder test";
+    let path = "";
+    for (let i = 1; i < fullPath.current.length; i++)
+      path += fullPath.current[i] + "/";
+    path += folderName + "/";
+    const fileRef = props.dbRef.child(path + "index_tmp");
+    fileRef.set({
+      name: "index_tmp",
+    });
+  };
+
   return (
     <div>
-      {/* {selected.length > 0 && <Button onClick={deleteSelected}>DELETE</Button>} */}
-      <ToolBar selected={selected} onClickDelete={deleteSelected}/>
+      <ToolBar
+        selected={selected}
+        onDelete={deleteSelected}
+        onCreateFolder={createFolder}
+      />
       <NavBar folders={foldersOpen} onNavigateToFolder={openFolder} />
       <div className="FileManager">
         {files.map((item) => (
