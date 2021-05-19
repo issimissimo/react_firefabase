@@ -53,6 +53,11 @@ function FileManager(props) {
   const clickedRef = useRef();
 
   useEffect(() => {
+    console.log("SETTAGGIO FOLDERSoPEN")
+    console.log(foldersOpen)
+  }, [foldersOpen]);
+
+  useEffect(() => {
     clickedRef.current = clicked;
   }, [clicked]);
 
@@ -66,6 +71,9 @@ function FileManager(props) {
       };
 
       openFolder(rootObj, null, null, clicked);
+      console.log("++++++++++++++++++++")
+      console.log(fullPath.current)
+      console.log("++++++++++++++++++++")
     });
 
     // const rootObj = {
@@ -107,7 +115,7 @@ function FileManager(props) {
     return array;
   };
 
-  /// select all files inside a folder (also nested)
+  /// return all files inside a folder object (also nested)
   const getAllFilesInFolder = (folder) => {
     const array = [];
     const iterate = (_array) => {
@@ -118,6 +126,22 @@ function FileManager(props) {
     };
     iterate(folder);
     return array;
+  };
+
+  /// return the folder object
+  /// from array of folder names and initial object
+  const getFolderFromPath = (path, object) => {
+    let folderObj = {};
+    let index = 0;
+    const iterate = (obj) => {
+      if (index < path.length - 1) {
+        index++;
+        const _obj = obj.value.find((el) => el.name === path[index]);
+        iterate(_obj);
+      } else folderObj = obj;
+    };
+    iterate(object);
+    return folderObj;
   };
 
   ////////////////////////////////////////////////////////////////////////
@@ -182,6 +206,9 @@ function FileManager(props) {
         ? [...foldersOpen, folder]
         : foldersOpen.slice(0, index + 1);
     setFoldersOpen(newFoldersOpen);
+    console.log("--------------")
+    console.log(newFoldersOpen)
+    console.log("--------------")
 
     /// set fullPath
     fullPath.current = newFoldersOpen.map((folder) => {

@@ -13,7 +13,6 @@ function SingleFile(props) {
     console.log("doubleclick....");
     props.onDoubleClick(props.item);
   };
-
   const { handleClick, handleDoubleClick } = useSingleAndDoubleClicks({
     onClick: myClickHandler,
     onDoubleClick: myDoubleClickHandler,
@@ -38,9 +37,8 @@ function SingleFile(props) {
         <span className="SingleFile-text">{props.item.name}</span>
       </div>
     );
-  } else {
-    return null;
   }
+  return null;
 }
 
 export default SingleFile;
