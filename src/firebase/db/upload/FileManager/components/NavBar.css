@@ -5,12 +5,15 @@
   cursor: pointer;
 }
 
-.NavBar-item {
-  padding: 5px;
+.NavBar-div {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 30px;
+}
+
+.NavBar-item {
+  padding: 5px;
 }
 
 .NavBar-item:hover {
