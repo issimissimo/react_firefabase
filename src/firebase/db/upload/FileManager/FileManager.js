@@ -6,31 +6,25 @@ import SingleFile from "./components/SingleFile";
 import ToolBar from "./components/ToolBar";
 import NavBar from "./components/NavBar";
 import "./FileManager.css";
-import { Button } from "@material-ui/core";
+import { compareToObject } from "./components/utils/compare";
+import { compareToArray } from "./components/utils/compare";
+// import RenamePanel from "./components/Animated-modal.component"
 
 function FileManager(props) {
-  const [foldersOpen, setFoldersOpen] = useState([]);
-
-  const [selected, setSelected] = useState([]);
-  const fullPath = useRef();
-  const clickedRef = useRef();
-
-  /// NEW....
   const [path, setPath] = useState(["root"]);
   const [files, setFiles] = useState([]);
+  const [selected, setSelected] = useState([]);
   const [clicked, setClicked] = useState({});
-  const rootObj = useRef();
+  const [uploading, setUploading] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false)
+  const rootObj = useRef({});
   const pathRef = useRef(path);
-
-  useEffect(() => {
-    clickedRef.current = clicked;
-  }, [clicked]);
+  // const newFolder = useRef({});
 
   ///
   /// on mounting
   ///
   useEffect(() => {
-    console.log("---init----")
     /// create rootObj
     rootObj.current = {
       key: "root",
@@ -39,7 +33,6 @@ function FileManager(props) {
     /// listen to Database changes
     props.dbRef.on("value", (snapshot) => {
       rootObj.current.value = objToArray(snapshot.val());
-      console.log(pathRef.current)
       updatePath([...pathRef.current]);
     });
   }, []);
@@ -48,23 +41,11 @@ function FileManager(props) {
   /// update files when path change
   ///
   useEffect(() => {
-    console.log(path)
     if (rootObj.current) {
-      console.log(path)
       const obj = getFolderFromPath(path, rootObj.current);
       setFiles(obj.value);
     }
   }, [path]);
-
-
-  ///
-  /// keep in sync path & pathRef
-  ///
-  const updatePath = (newPath) => {
-    pathRef.current = newPath;
-    setPath(newPath);
-  }
-
 
   ///
   /// move to a next folder by key
@@ -81,23 +62,28 @@ function FileManager(props) {
     updatePath(newPath);
   };
 
-  // ///
-  // /// handle click on item
-  // ///
-  // const handleClickOnItem = (item) => {
-  //   if (item !== selected) {
-  //     /// select item
-  //     setSelected(item);
-  //   } else {
-  //     /// remove all selections
-  //     setSelected([]);
-  //   }
-  // };
+  ///
+  /// handle single click on item
+  ///
+  const handleClickOnItem = (item, ctrlKey) => {
+    const files = item.isFolder ? getAllFilesInFolder(item) : [];
+    files.push(item);
+
+    if (!compareToArray(item, selected)) {
+      /// select item
+      ctrlKey ? setSelected([...selected, ...files]) : setSelected(files);
+    } else {
+      /// remove selections
+      ctrlKey
+        ? setSelected(selected.filter((_item) => !files.includes(_item)))
+        : setSelected([]);
+    }
+  };
 
   ///
   /// handle double click on item
   ///
-  const handleDbClickOnItem = (item) => {
+  const handleDoublebClickOnItem = (item) => {
     /// move to folder
     if (item.isFolder) {
       moveToNextFolder(item.key);
@@ -110,6 +96,13 @@ function FileManager(props) {
     }
   };
 
+  /// update the path (and keep in sync path & pathRef)
+  /// this function is "functional" for other methods
+  const updatePath = (newPath) => {
+    pathRef.current = newPath;
+    setPath(newPath);
+  };
+
   ////////////////////////////////////////////////////////////////////////
   //////////////////// TO BE CONVERTED TO API .../////////////////////////
   ////////////////////////////////////////////////////////////////////////
@@ -118,26 +111,29 @@ function FileManager(props) {
   /// to array
   const objToArray = (object, path = "", folderName = "") => {
     const array = [];
-    for (const [key, value] of Object.entries(object)) {
-      const slash = folderName ? "/" : "";
-      const name = value.hasOwnProperty("name") ? value.name : key;
-      const newObj = {
-        key: key,
-        name: name,
-        path: path + folderName + slash,
-        visible: name === "index_tmp" ? false : true,
-        isFolder: value.hasOwnProperty("name") ? false : true,
-        isSelected: false,
-        isClicked: name === clickedRef.current.name ? true : false,
-        value: value,
-      };
+    if (object) {
+      for (const [key, value] of Object.entries(object)) {
+        const slash = folderName ? "/" : "";
+        const name = value.hasOwnProperty("name") ? value.name : key;
+        const newObj = {
+          key: key,
+          name: name,
+          path: path + folderName + slash,
+          visible: name === "index_tmp" ? false : true,
+          isFolder: value.hasOwnProperty("name") ? false : true,
+          // isSelected: false,
+          // isClicked: name === clickedRef.current.name ? true : false,
+          value: value,
+        };
 
-      if (newObj.isFolder) {
-        newObj.value = objToArray(value, newObj.path, key);
+        if (newObj.isFolder) {
+          newObj.value = objToArray(value, newObj.path, key);
+        }
+
+        array.push(newObj);
       }
-
-      array.push(newObj);
     }
+    console.log(array)
     return array;
   };
 
@@ -150,7 +146,7 @@ function FileManager(props) {
         else array.push(el);
       });
     };
-    iterate(folder);
+    iterate(folder.value);
     return array;
   };
 
@@ -174,31 +170,31 @@ function FileManager(props) {
   ////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////
 
-  ///
-  /// select items on click
-  ///
-  const handleClickOnItem = (item) => {
-    item.isSelected = !item.isSelected;
+  // ///
+  // /// select items on click
+  // ///
+  // const _handleClickOnItem = (item) => {
+  //   item.isSelected = !item.isSelected;
 
-    /// if is it a folder select all files inside
-    if (item.isFolder) {
-      const filesInFolder = getAllFilesInFolder(item.value);
+  //   /// if is it a folder select all files inside
+  //   if (item.isFolder) {
+  //     const filesInFolder = getAllFilesInFolder(item.value);
 
-      if (item.isSelected) {
-        setSelected([...selected, ...filesInFolder]);
-        filesInFolder.forEach((el) => (el.isSelected = true));
-      } else {
-        setSelected(selected.filter((_item) => !filesInFolder.includes(_item)));
-        filesInFolder.forEach((el) => (el.isSelected = false));
-      }
-    }
-    /// just a single file
-    else {
-      item.isSelected
-        ? setSelected([...selected, item])
-        : setSelected(selected.filter((_item) => _item !== item));
-    }
-  };
+  //     if (item.isSelected) {
+  //       setSelected([...selected, ...filesInFolder]);
+  //       filesInFolder.forEach((el) => (el.isSelected = true));
+  //     } else {
+  //       setSelected(selected.filter((_item) => !filesInFolder.includes(_item)));
+  //       filesInFolder.forEach((el) => (el.isSelected = false));
+  //     }
+  //   }
+  //   /// just a single file
+  //   else {
+  //     item.isSelected
+  //       ? setSelected([...selected, item])
+  //       : setSelected(selected.filter((_item) => _item !== item));
+  //   }
+  // };
 
   // ///
   // /// open item on doubleclick (file or folder)
@@ -247,9 +243,11 @@ function FileManager(props) {
   ///
   const deleteSelected = () => {
     selected.forEach((item) => {
-      props.dbRef.child(item.path + item.key).remove();
-      if (item.name !== "index_tmp")
-        props.storageRef.child(item.path + item.name).delete();
+      if (!item.isFolder) {
+        props.dbRef.child(item.path + item.key).remove();
+        if (item.name !== "index_tmp")
+          props.storageRef.child(item.value.storageKey).delete();
+      }
     });
     setSelected([]);
   };
@@ -257,25 +255,76 @@ function FileManager(props) {
   ///
   /// create folder
   ///
-  const createFolder = (_folderName) => {
-    const folderName = "folder test";
-    let path = "";
-    for (let i = 1; i < fullPath.current.length; i++)
-      path += fullPath.current[i] + "/";
-    path += folderName + "/";
-    const fileRef = props.dbRef.child(path + "index_tmp");
+  const createFolder = (folderName) => {
+
+    console.log(folderName)
+
+    // /// set newFolder current as a fake obj
+    // /// to compare it next with the new folder,
+    // /// so to check if it's just created and need
+    // /// to be renamed
+    // newFolder.current = {
+    //   name: _folderName,
+    //   path: "",
+    // }
+
+    
+
+    // const folderName = "New folder";
+    let _path = "";
+    for (let i = 1; i < path.length; i++) _path += path[i] + "/";
+    _path += folderName + "/";
+    const fileRef = props.dbRef.child(_path + "index_tmp");
     fileRef.set({
       name: "index_tmp",
     });
   };
 
+  ///
+  /// upload files
+  ///
+  const uploadFiles = (files) => {
+    console.log(files);
+  };
+
+  ///
+  /// rename
+  ///
+  const rename = () => {
+    /// reset newFolder current
+    // newFolder.current = {}
+
+    const key = "folder test";
+    const newKey = "cartella";
+    const newName = "newCattura.JPG";
+    const fileRef = props.dbRef;
+    fileRef
+      .child(key)
+      .once("value")
+      .then((snap) => {
+        var data = snap.val();
+        console.log(data);
+        // data.name = newName;
+        var update = {};
+        update[key] = null;
+        update[newKey] = data;
+        fileRef.update(update);
+      });
+  };
+
+  ///
+  /// render
+  ///
   if (files) {
     return (
       <div>
+        {/* <RenamePanel isOpen={modalOpen}/> */}
         <ToolBar
           selected={selected}
           onDelete={deleteSelected}
           onCreateFolder={createFolder}
+          onUpload={uploadFiles}
+          onRename={rename}
         />
         <NavBar path={path} onClick={moveToPreviousFolder} />
         <div className="FileManager">
@@ -283,8 +332,10 @@ function FileManager(props) {
             <SingleFile
               key={item.name}
               item={item}
+              selected={selected}
+              clicked={clicked}
               onClick={handleClickOnItem}
-              onDoubleClick={handleDbClickOnItem}
+              onDoubleClick={handleDoublebClickOnItem}
             />
           ))}
         </div>

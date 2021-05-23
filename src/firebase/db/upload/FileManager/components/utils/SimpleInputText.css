@@ -1,0 +1,17 @@
+.SimpleInputText {
+  background-color: transparent;
+  text-align: center;
+  outline: none;
+  outline-style: none;
+  box-shadow: none;
+  /* width: 50px; */
+  border: 0;
+  border-color:transparent;
+  resize: none;
+}
+.SimpleInputText:focus,
+.SimpleInputText:active {
+  /* border: 1;
+  border-color:turquoise */
+  /* border-bottom: 2px solid #1c87c9; */
+}

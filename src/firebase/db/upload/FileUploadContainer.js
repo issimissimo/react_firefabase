@@ -4,6 +4,7 @@ import "firebase/database";
 import "firebase/storage";
 import ProgressBar from "./ProgressBar";
 import "./FileUploadContainer.css";
+import {generateID} from "../../generateID"
 
 const removeExtension = (string) => {
   const st = string.replace(/\.[^/.]+$/, "");
@@ -26,7 +27,9 @@ function FileUploadContainer(props) {
   ///
   const uploadFile = () => {
     console.log("uploading " + props.file.name + " ...");
-    const fileRef = props.storageRef.child(path + props.file.name);
+    const storageKey = generateID();
+    // const fileRef = props.storageRef.child(path + props.file.name);
+    const fileRef = props.storageRef.child(storageKey);
     task.current = fileRef.put(props.file);
 
     task.current.on(
@@ -50,6 +53,7 @@ function FileUploadContainer(props) {
             // type: self.fileType,
             // fullName: self.file.name,
             name: props.file.name,
+            storageKey: storageKey,
             url: fileUrl,
             // thumbUrl: null,
             // shared: false,
