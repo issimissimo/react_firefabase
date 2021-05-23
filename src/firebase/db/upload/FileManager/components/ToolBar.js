@@ -63,7 +63,7 @@ function ToolBar(props) {
     }
     if (compareSimpleObjects(state.current, STATE.RENAME)) {
       console.log("rename");
-      // props.onRename(value);
+      props.onRename(value);
     }
     if (compareSimpleObjects(state.current, STATE.DELETE)) {
       console.log("delete");
@@ -123,7 +123,7 @@ function ToolBar(props) {
         variant="contained"
         color="primary"
         disableElevation
-        // disabled={props.selected.length !== 1}
+        disabled={props.selected.length !== 1}
         onClick={handleRenameButton}
       >
         Rename

@@ -4,6 +4,7 @@ import ConfirmComponent from "./ConfirmComponent";
 
 function InputComponent(props) {
   const [value, setValue] = useState(props.value);
+  const [error, setError] = useState(false);
   const onChange = (e) => {
     setValue(e.target.value);
   };
@@ -12,7 +13,8 @@ function InputComponent(props) {
     if (e.key === "Escape") onEscape();
   };
   const onSubmit = (e) => {
-    props.onSubmit(value, e);
+    if (value) props.onSubmit(value, e);
+    else setError(true);
   };
   const onEscape = () => {
     props.onEscape();
@@ -25,6 +27,7 @@ function InputComponent(props) {
         label={props.label}
         onKeyDown={(e) => onKeyDown(e)}
         onChange={onChange}
+        error={error}
       />
       <ConfirmComponent onConfirm={onSubmit} onCancel={onEscape} />
     </div>

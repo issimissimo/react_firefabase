@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import FolderOpenOutlinedIcon from "@material-ui/icons/FolderOpenOutlined";
 import InsertDriveFileOutlinedIcon from "@material-ui/icons/InsertDriveFileOutlined";
-import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import "./SingleFile.css";
 import useSingleAndDoubleClicks from "./utils/useSingleAndDoubleClicks";
 import { compareToObject } from "./utils/compare";
@@ -29,23 +28,16 @@ function SingleFile(props) {
     <InsertDriveFileOutlinedIcon style={{ fontSize: 40 }} />
   );
 
-  const fileSelectedIcon = () => {
-    if (compareToArray(props.item, props.selected)) {
-      return (
-        <div className="FileSelected">
-          <CheckCircleIcon style={{ fontSize: 20 }} />
-        </div>
-      );
-    } else {
-      return null;
-    }
-  };
-
   if (props.item.visible) {
     return (
       <div
         className={`${
           compareToObject(props.item, props.clicked) ? "SingleFile-clicked" : ""
+        }
+        ${
+          compareToArray(props.item, props.selected)
+            ? "SingleFile-selected"
+            : ""
         }  SingleFile`}
         onClick={(e) => {
           handleClick(e);
@@ -54,7 +46,6 @@ function SingleFile(props) {
       >
         {icon}
         <span className="SingleFile-text">{props.item.name}</span>
-        {fileSelectedIcon()}
       </div>
     );
   }

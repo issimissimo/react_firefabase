@@ -6,20 +6,15 @@ import SingleFile from "./components/SingleFile";
 import ToolBar from "./components/ToolBar";
 import NavBar from "./components/NavBar";
 import "./FileManager.css";
-import { compareToObject } from "./components/utils/compare";
 import { compareToArray } from "./components/utils/compare";
-// import RenamePanel from "./components/Animated-modal.component"
 
 function FileManager(props) {
   const [path, setPath] = useState(["root"]);
   const [files, setFiles] = useState([]);
   const [selected, setSelected] = useState([]);
   const [clicked, setClicked] = useState({});
-  const [uploading, setUploading] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false)
   const rootObj = useRef({});
   const pathRef = useRef(path);
-  // const newFolder = useRef({});
 
   ///
   /// on mounting
@@ -66,7 +61,7 @@ function FileManager(props) {
   /// handle single click on item
   ///
   const handleClickOnItem = (item, ctrlKey) => {
-    const files = item.isFolder ? getAllFilesInFolder(item) : [];
+    const files = [];
     files.push(item);
 
     if (!compareToArray(item, selected)) {
@@ -133,7 +128,7 @@ function FileManager(props) {
         array.push(newObj);
       }
     }
-    console.log(array)
+    console.log(array);
     return array;
   };
 
@@ -170,81 +165,24 @@ function FileManager(props) {
   ////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////
 
-  // ///
-  // /// select items on click
-  // ///
-  // const _handleClickOnItem = (item) => {
-  //   item.isSelected = !item.isSelected;
-
-  //   /// if is it a folder select all files inside
-  //   if (item.isFolder) {
-  //     const filesInFolder = getAllFilesInFolder(item.value);
-
-  //     if (item.isSelected) {
-  //       setSelected([...selected, ...filesInFolder]);
-  //       filesInFolder.forEach((el) => (el.isSelected = true));
-  //     } else {
-  //       setSelected(selected.filter((_item) => !filesInFolder.includes(_item)));
-  //       filesInFolder.forEach((el) => (el.isSelected = false));
-  //     }
-  //   }
-  //   /// just a single file
-  //   else {
-  //     item.isSelected
-  //       ? setSelected([...selected, item])
-  //       : setSelected(selected.filter((_item) => _item !== item));
-  //   }
-  // };
-
-  // ///
-  // /// open item on doubleclick (file or folder)
-  // ///
-  // const handleDoubleClickOnItem = (item) => {
-  //   // clickedFile.current = item;
-
-  //   if (item.isFolder) {
-  //     openFolder(item);
-  //   } else {
-  //     if (item !== clicked) {
-  //       console.log("devo aprire il file: " + item.key);
-  //       if (clicked) {
-  //         clicked.isClicked = false;
-  //       }
-  //       item.isClicked = true;
-  //       setClicked(item);
-  //     }
-  //   }
-  // };
-
-  // ///
-  // /// open folder
-  // ///
-  // const openFolder = (folder, index = null) => {
-  //   setFiles(folder.value);
-
-  //   /// set foldersOpen
-  //   const newFoldersOpen =
-  //     index === null
-  //       ? [...foldersOpen, folder]
-  //       : foldersOpen.slice(0, index + 1);
-  //   setFoldersOpen(newFoldersOpen);
-  //   console.log("--------------");
-  //   console.log(newFoldersOpen);
-  //   console.log("--------------");
-
-  //   /// set fullPath
-  //   fullPath.current = newFoldersOpen.map((folder) => {
-  //     return folder.key;
-  //   });
-  // };
-
   ///
   /// delete selected files
   ///
   const deleteSelected = () => {
+    const itemsToDelete = [...selected];
+
+    /// get all the files in the folder
     selected.forEach((item) => {
+      if (item.isFolder) {
+        itemsToDelete.push(...getAllFilesInFolder(item));
+      }
+    });
+
+    itemsToDelete.forEach((item) => {
       if (!item.isFolder) {
+        /// delete from db
         props.dbRef.child(item.path + item.key).remove();
+        /// delete from storage
         if (item.name !== "index_tmp")
           props.storageRef.child(item.value.storageKey).delete();
       }
@@ -256,21 +194,6 @@ function FileManager(props) {
   /// create folder
   ///
   const createFolder = (folderName) => {
-
-    console.log(folderName)
-
-    // /// set newFolder current as a fake obj
-    // /// to compare it next with the new folder,
-    // /// so to check if it's just created and need
-    // /// to be renamed
-    // newFolder.current = {
-    //   name: _folderName,
-    //   path: "",
-    // }
-
-    
-
-    // const folderName = "New folder";
     let _path = "";
     for (let i = 1; i < path.length; i++) _path += path[i] + "/";
     _path += folderName + "/";
@@ -288,28 +211,25 @@ function FileManager(props) {
   };
 
   ///
-  /// rename
+  /// rename a single selected files
   ///
-  const rename = () => {
-    /// reset newFolder current
-    // newFolder.current = {}
-
-    const key = "folder test";
-    const newKey = "cartella";
-    const newName = "newCattura.JPG";
+  const renameSelected = (newName) => {
+    const item = selected[0];
+    const newKey = newName;
     const fileRef = props.dbRef;
     fileRef
-      .child(key)
+      .child(item.path + item.key)
       .once("value")
       .then((snap) => {
         var data = snap.val();
         console.log(data);
-        // data.name = newName;
+        if (!item.isFolder) data.name = newName;
         var update = {};
-        update[key] = null;
-        update[newKey] = data;
+        update[item.path + item.key] = null;
+        update[item.path + newKey] = data;
         fileRef.update(update);
       });
+    setSelected([]);
   };
 
   ///
@@ -318,13 +238,12 @@ function FileManager(props) {
   if (files) {
     return (
       <div>
-        {/* <RenamePanel isOpen={modalOpen}/> */}
         <ToolBar
           selected={selected}
           onDelete={deleteSelected}
+          onRename={renameSelected}
           onCreateFolder={createFolder}
           onUpload={uploadFiles}
-          onRename={rename}
         />
         <NavBar path={path} onClick={moveToPreviousFolder} />
         <div className="FileManager">
